@@ -1,2 +1,0 @@
-CLI, create flutter project for android 
-flutter create --platforms android project_name
