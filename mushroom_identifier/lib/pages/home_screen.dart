@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/button_component.dart';
 import '../components/language_toggle_button.dart';
 import '../components/theme_toggle_button.dart';
 
@@ -10,10 +11,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   // --- State Variables (kept in HomeScreen for now) ---
   bool _isDarkMode = false;
-  bool _isVietnamese = true;
+  bool _isEnglish = true;
 
   // --- Methods to Toggle State (kept in HomeScreen for now) ---
   void _toggleTheme() {
@@ -25,9 +25,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // --- Methods to Toggle State (kept in HomeScreen for now) ---
   void _toggleLanguage() {
     setState(() {
-      _isVietnamese = !_isVietnamese;
+      _isEnglish = !_isEnglish;
     });
   }
+
+  void _doesNothing() {}
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         actions: <Widget>[
           LanguageToggleButtonWidget(
-            isVietnamese: _isVietnamese,
+            isEnglish: _isEnglish,
             onPressed: _toggleLanguage,
           ),
           ThemeToggleButtonWidget(
@@ -50,10 +52,41 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("TODO Home Screen"),
+            ButtonComponent(
+              label: "Gallery",
+              fontSize: 20,
+              icon: Icons.image,
+              iconColor: Colors.black,
+              iconSize: 20,
+              onPressed: _doesNothing,
+              width: 300,
+              height: 150,
+            ),
             const SizedBox(height: 20),
-            Text("Current Theme: ${_isDarkMode ? "Dark" : "Light"}"),
-            Text("Current Language: ${_isVietnamese ? "Vietnamese" : "English (USA)"}"),
+
+            Divider(
+              height: 20,
+              color: Colors.grey,
+              thickness: 2,
+              indent: 20,
+              endIndent: 20,
+            ),
+
+            const SizedBox(height: 20),
+            ButtonComponent(
+              label: "Camera",
+              fontSize: 20,
+              icon: Icons.camera,
+              iconColor: Colors.black,
+              iconSize: 20,
+              onPressed: _doesNothing,
+              width: 300,
+              height: 150,
+            ),
+
+            // const SizedBox(height: 20),
+            // Text("Current Theme: ${_isDarkMode ? "Dark" : "Light"}"),
+            // Text("Current Language: ${_isEnglish ? "English (USA)" : "Vietnamese"}"),
           ],
         ),
       ),

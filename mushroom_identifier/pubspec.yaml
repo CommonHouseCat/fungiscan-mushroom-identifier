@@ -9,8 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
   cupertino_icons: ^1.0.8
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -20,4 +21,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/.
+    - assets/sample/.
+    - assets/sample/sample.jpg
+    - assets/sample/error.jpg
   uses-material-design: true
