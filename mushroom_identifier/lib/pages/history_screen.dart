@@ -39,7 +39,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         });
       }
     } catch (e) {
-      print('Error fetching mushroom info history: $e');
+      debugPrint('Error fetching mushroom info history: $e');
       if (mounted) {
         setState(() {
           _errorMessage = 'Error fetching mushroom info history: $e';
@@ -68,7 +68,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         );
       }
     } catch (e) {
-      print("Error deleting mushroom: $e");
+      debugPrint("Error deleting mushroom: $e");
       if (mounted) {
         _fetchMushroomInfoHistory();
         ScaffoldMessenger.of(context).showSnackBar(

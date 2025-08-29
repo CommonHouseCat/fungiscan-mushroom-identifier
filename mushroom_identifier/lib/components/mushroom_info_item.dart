@@ -38,7 +38,7 @@ class MushroomInfoItem extends StatelessWidget {
         final Map<String, dynamic> parsedBasicInfo = jsonDecode(basicInfo);
         mushroomName = parsedBasicInfo['name'] as String? ?? 'Unknown Mushroom';
       } catch (e) {
-        print("Error decoding basic_info JSON in MushroomInfoItem: $e");
+        debugPrint('Error parsing JSON in MushroomInfoItem: $e');
         mushroomName = 'Error Reading Name';
       }
     }

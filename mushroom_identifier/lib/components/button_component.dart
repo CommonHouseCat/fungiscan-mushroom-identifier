@@ -57,7 +57,7 @@ class ButtonComponent extends StatelessWidget {
               child: Icon(
                 icon,
                 color: iconColor,
-                size: this.iconSize,
+                size: iconSize,
               ),
             )
           ),

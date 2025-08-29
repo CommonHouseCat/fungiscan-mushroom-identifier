@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../components/button_component.dart';
 import '../components/language_toggle_button.dart';
 import '../components/theme_toggle_button.dart';
+import 'image_editor_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +32,69 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _doesNothing() {}
+  Future<void> _openGallery() async {
+    var status = await Permission.photos.request();
+    if(status.isGranted) {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (!mounted) return;
+      if(image != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ImageEditorScreen(imagePath: image.path),
+          ),
+        );
+      }
+    }
+    else if (status.isPermanentlyDenied) {
+      _openAppSettings();
+    }
+  }
+
+  Future<void> _openCamera() async {
+    var status = await Permission.camera.request();
+    if(status.isGranted) {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.camera);
+      if (!mounted) return;
+      if(image != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ImageEditorScreen(imagePath: image.path),
+          ),
+        );
+      }
+    }
+    else if (status.isPermanentlyDenied) {
+      _openAppSettings();
+    }
+  }
+
+  // Open app settings if permission is  denied
+  void _openAppSettings() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permission Denied'),
+        content: const Text('Please enable permissions in app settings.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,12 +123,12 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icons.image,
               iconColor: Colors.black,
               iconSize: 20,
-              onPressed: _doesNothing,
+              onPressed: _openGallery,
               width: 300,
               height: 150,
             ),
-            const SizedBox(height: 20),
 
+            const SizedBox(height: 20),
             Divider(
               height: 20,
               color: Colors.grey,
@@ -71,22 +136,18 @@ class _HomeScreenState extends State<HomeScreen> {
               indent: 20,
               endIndent: 20,
             ),
-
             const SizedBox(height: 20),
+
             ButtonComponent(
               label: "Camera",
               fontSize: 20,
               icon: Icons.camera,
               iconColor: Colors.black,
               iconSize: 20,
-              onPressed: _doesNothing,
+              onPressed: _openCamera,
               width: 300,
               height: 150,
             ),
-
-            // const SizedBox(height: 20),
-            // Text("Current Theme: ${_isDarkMode ? "Dark" : "Light"}"),
-            // Text("Current Language: ${_isEnglish ? "English (USA)" : "Vietnamese"}"),
           ],
         ),
       ),

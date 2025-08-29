@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 import 'dart:convert';
@@ -15,7 +13,7 @@ class MushroomInformationScreen extends StatelessWidget {
       final Map<String, dynamic> parsed = jsonDecode(jsonString);
       return parsed[key] as String? ?? defaultValue;
     } catch (e) {
-      print("Error parsing JSON in MushroomInformationScreen: $e");
+      debugPrint("Error parsing JSON in MushroomInformationScreen: $e");
       return defaultValue;
     }
   }

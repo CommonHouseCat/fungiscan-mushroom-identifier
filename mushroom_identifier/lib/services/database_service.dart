@@ -64,7 +64,6 @@ class DatabaseService {
           columnSafetyTips: 'Avoid ingestion, seek medical help if consumed',
           columnDateOfCreation: DateTime.now().toIso8601String(),
         });
-        print("DATABASE: Sample data insertion attempted in onCreate.");
       },
     );
   }
