@@ -14,6 +14,7 @@ dependencies:
   path_provider: ^2.1.5
   image_picker: ^1.2.0
   permission_handler: ^12.0.1
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:
@@ -23,4 +24,6 @@ dev_dependencies:
 flutter:
   assets:
     - assets/.
+    - assets/sample/error.jpg
+    - assets/sample/sample.jpg
   uses-material-design: true

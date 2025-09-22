@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../components/button_component.dart';
-import '../components/language_toggle_button.dart';
 import '../components/theme_toggle_button.dart';
 import 'image_editor_screen.dart';
 
@@ -16,19 +15,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // --- State Variables (kept in HomeScreen for now) ---
   bool _isDarkMode = false;
-  bool _isEnglish = true;
 
   // --- Methods to Toggle State (kept in HomeScreen for now) ---
   void _toggleTheme() {
     setState(() {
       _isDarkMode = !_isDarkMode;
-    });
-  }
-
-  // --- Methods to Toggle State (kept in HomeScreen for now) ---
-  void _toggleLanguage() {
-    setState(() {
-      _isEnglish = !_isEnglish;
     });
   }
 
@@ -103,10 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("Home"),
         centerTitle: false,
         actions: <Widget>[
-          LanguageToggleButtonWidget(
-            isEnglish: _isEnglish,
-            onPressed: _toggleLanguage,
-          ),
           ThemeToggleButtonWidget(
             isDarkMode: _isDarkMode,
             onPressed: _toggleTheme,
