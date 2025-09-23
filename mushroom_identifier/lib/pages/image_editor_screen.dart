@@ -5,8 +5,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image/image.dart' as img;
+import 'package:mushroom_identifier/pages/inference_screen.dart';
 import 'package:path_provider/path_provider.dart';
-import 'processed_preview_screen.dart';
 
 class ImageEditorScreen extends StatefulWidget {
   final String imagePath;
@@ -68,7 +68,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => ProcessedPreviewScreen(imagePath: outPath),
+        builder: (_) => InferenceScreen(imagePath: outPath),
       ),
     );
   }
@@ -109,7 +109,7 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
                             angle: _rotation * math.pi / 180,
                             child: Image.file(
                               File(widget.imagePath),
-                              fit: BoxFit.contain,
+                              fit: BoxFit.contain, // TODO: Adjust to BoxFit.cover for testing
                               alignment: Alignment.center,
                               width: double.infinity,
                               height: double.infinity,
