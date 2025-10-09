@@ -26,10 +26,6 @@ class _InferenceScreenState extends State<InferenceScreen> {
     super.initState();
     _runInference();
   }
-  // curl -X POST "https://8000-dep-01k71e21emmesn229qak2xj43m-d.cloudspaces.litng.ai/predict" \
-  // -H "accept: application/json" \
-  // -H "Authorization: Bearer fc77e613-3702-46c6-b4bb-693df490a5a9" \
-  // -F "data=@/home/generic/Downloads/jack.png"
   Future<void> _runInference() async {
     try {
       final dio = Dio();
@@ -50,7 +46,6 @@ class _InferenceScreenState extends State<InferenceScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => InferenceResultScreen(
-            imagePath: widget.imagePath,
             predictedClass: data['predicted_class'],
             predictedIndex: data['index'],
             confidence: data['confidence'],
@@ -65,7 +60,6 @@ class _InferenceScreenState extends State<InferenceScreen> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
