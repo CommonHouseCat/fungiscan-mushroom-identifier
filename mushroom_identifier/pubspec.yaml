@@ -29,8 +29,7 @@ flutter:
     - assets/.
     - assets/sample/error.jpg
     - assets/sample/sample.jpg
-    - assets/models/mushroom_efficientnet_lite2.pt
-    - assets/models/mushroom_mobilenetv2.pt
     - assets/labels.txt
+    - assets/mushroom_info.json
     - .env
   uses-material-design: true

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -18,7 +19,7 @@ class DatabaseService {
   static const String databaseName = 'mushroom_information.db';
   static const String tableMushrooms = 'mushrooms';
   static const String columnId = 'id';
-  static const String columnImagePath = 'image_path';
+  static const String columnImage = 'image';
   static const String columnConfidenceScore = 'confidence_score';
   static const String columnBasicInfo = 'basic_info';
   static const String columnPhysicalCharacteristics = 'physical_characteristics';
@@ -38,7 +39,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE $tableMushrooms (
             $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-            $columnImagePath TEXT,
+            $columnImage BLOB,
             $columnConfidenceScore REAL,
             $columnBasicInfo TEXT,
             $columnPhysicalCharacteristics TEXT,
@@ -48,22 +49,6 @@ class DatabaseService {
             $columnDateOfCreation TEXT            
           )
         ''');
-
-        // Insert sample data
-        await db.insert(tableMushrooms, {
-          columnImagePath: 'assets/sample/sample.jpg',
-          columnConfidenceScore: 0.95,
-          columnBasicInfo: '{"name": "Fly Agaric", "scientific_name": "Amanita muscaria", '
-              '"edibility": "Toxic, hallucinogenic. Ingestion can cause severe gastrointestinal distress, neurological symptoms, '
-              'and potentially death. Historically used for ritualistic purposes in small doses.", "toxicity_level": "Highly Toxic", "'
-              'habitat": "Commonly found in mycorrhizal association with coniferous and deciduous trees, particularly birch and pine. '
-              'Grows in forests."}',
-          columnPhysicalCharacteristics: 'Red cap with white warts, white stem',
-          columnLookAlike: 'Similar to edible mushrooms but distinguishable by warts',
-          columnUsages: 'Historically ritualistic',
-          columnSafetyTips: 'Avoid ingestion, seek medical help if consumed',
-          columnDateOfCreation: DateTime.now().toIso8601String(),
-        });
       },
     );
   }
@@ -82,7 +67,26 @@ class DatabaseService {
     );
   }
 
-  // TODO: Implement add mushroom info after firebase integration and AI scanning feature
+  Future<void> insertMushroomInfo({
+    required Uint8List imageBytes,
+    required double confidenceScore,
+    required String basicInfo,
+    required String physicalCharacteristics,
+    required String lookAlike,
+    required String usages,
+    required String safetyTips,
+  }) async {
+    final db = await database;
+    await db.insert(tableMushrooms, {
+      columnImage: imageBytes,
+      columnConfidenceScore: confidenceScore,
+      columnBasicInfo: basicInfo,
+      columnPhysicalCharacteristics: physicalCharacteristics,
+      columnLookAlike: lookAlike,
+      columnUsages: usages,
+      columnSafetyTips: safetyTips,
+      columnDateOfCreation: DateTime.now().toIso8601String(),
+    });
+  }
 
-  // User cannot edit mushroom info
 }

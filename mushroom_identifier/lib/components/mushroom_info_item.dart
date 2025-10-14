@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../pages/mushroom_information_screen.dart';
 import '../services/database_service.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 
 class MushroomInfoItem extends StatelessWidget {
   final Map<String, dynamic> item;
@@ -28,7 +29,7 @@ class MushroomInfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String imagePath = item[DatabaseService.columnImagePath] as String? ?? 'assets/sample/error.jpg';
+    final Uint8List? imageBytes = item[DatabaseService.columnImage] as Uint8List?;
 
     String mushroomName = 'Unknown Mushroom';
     final dynamic basicInfo = item[DatabaseService.columnBasicInfo];
@@ -36,7 +37,7 @@ class MushroomInfoItem extends StatelessWidget {
     if (basicInfo != null && basicInfo is String) {
       try {
         final Map<String, dynamic> parsedBasicInfo = jsonDecode(basicInfo);
-        mushroomName = parsedBasicInfo['name'] as String? ?? 'Unknown Mushroom';
+        mushroomName = parsedBasicInfo['common_name'] as String? ?? 'Unknown Mushroom';
       } catch (e) {
         debugPrint('Error parsing JSON in MushroomInfoItem: $e');
         mushroomName = 'Error Reading Name';
@@ -55,36 +56,34 @@ class MushroomInfoItem extends StatelessWidget {
               onTap: () => _onItemTap(context),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                // Image
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 150,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Image.asset(
+                child: imageBytes != null
+                  ? Image.memory(
+                      imageBytes,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 150,
+                    )
+                  : Image.asset(
                       'assets/sample/error.jpg',
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: 150,
-                    );
-                  },
-                ),
+                    ),
               ),
             ),
             const SizedBox(height: 8),
             Row(
-              // Mushroom name
               children: [
-                Text(
-                  mushroomName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.start,
+                Expanded(
+                  child: Text(
+                    mushroomName,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.start,
+                  ),
                 ),
                 const Spacer(),
-                // Popup menu button
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.more_vert, color: Colors.black),
                   onSelected: (value) {

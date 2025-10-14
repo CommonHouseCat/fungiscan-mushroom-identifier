@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../components/mushroom_info_item.dart';
 import '../services/database_service.dart';
 

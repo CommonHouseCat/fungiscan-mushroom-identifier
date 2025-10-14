@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/database_service.dart';
 import 'dart:convert';
+import 'dart:typed_data';
 
 class MushroomInformationScreen extends StatelessWidget {
   final Map<String, dynamic> mushroomData;
@@ -52,7 +53,7 @@ class MushroomInformationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String imagePath = mushroomData[DatabaseService.columnImagePath] as String? ?? 'assets/sample/error.jpg';
+    final Uint8List? imageBytes = mushroomData[DatabaseService.columnImage] as Uint8List?;
     final double confidenceScore = (mushroomData[DatabaseService.columnConfidenceScore] as num?)?.toDouble() ?? 0.0;
     final String basicInfoJson = mushroomData[DatabaseService.columnBasicInfo] as String? ?? '{}';
     final String physicalCharacteristics = mushroomData[DatabaseService.columnPhysicalCharacteristics] as String? ?? 'N/A';
@@ -76,11 +77,18 @@ class MushroomInformationScreen extends StatelessWidget {
             // Image Section
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 250,
+              child: imageBytes != null
+                ? Image.memory(
+                    imageBytes,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 250,
+                  )
+                : Image.asset(
+                    'assets/sample/error.jpg',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 250,
               ),
             ),
             const SizedBox(height: 16),
@@ -91,14 +99,11 @@ class MushroomInformationScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             // Basic Information Section
-            Text(
-              'Basic Information',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Basic Information',style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             _buildInfoBox(
               children: [
-                _buildBulletPoint('Mushroom Name', _parseJsonField(basicInfoJson, 'name')),
+                _buildBulletPoint('Mushroom Name', _parseJsonField(basicInfoJson, 'common_name')),
                 _buildBulletPoint('Scientific Name', _parseJsonField(basicInfoJson, 'scientific_name')),
                 _buildBulletPoint('Edibility', _parseJsonField(basicInfoJson, 'edibility')),
                 _buildBulletPoint('Toxicity Level', _parseJsonField(basicInfoJson, 'toxicity_level')),
@@ -106,58 +111,24 @@ class MushroomInformationScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // Physical Characteristics Section
-            Text(
-              'Physical Characteristics',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Physical Characteristics', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            _buildInfoBox(
-              children: [
-                _buildBulletPoint('', physicalCharacteristics),
-              ],
-            ),
+            _buildInfoBox(children: [_buildBulletPoint('', physicalCharacteristics)]),
             const SizedBox(height: 16),
-            // Look Alike Section
-            Text(
-              'Look Alike',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Look Alike', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            _buildInfoBox(
-              children: [
-                _buildBulletPoint('', lookAlike),
-              ],
-            ),
+            _buildInfoBox(children: [_buildBulletPoint('', lookAlike)]),
             const SizedBox(height: 16),
-            // Usages Section
-            Text(
-              'Usages',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Usages', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            _buildInfoBox(
-              children: [
-                _buildBulletPoint('', usages),
-              ],
-            ),
+            _buildInfoBox(children: [_buildBulletPoint('', usages)]),
             const SizedBox(height: 16),
-            // Safety Tips Section
-            Text(
-              'Safety Tips',
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text('Safety Tips', style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
-            _buildInfoBox(
-              children: [
-                _buildBulletPoint('', safetyTips),
-              ],
-            ),
+            _buildInfoBox(children: [_buildBulletPoint('', safetyTips)]),
           ],
         ),
       ),
     );
   }
-
-
 }
