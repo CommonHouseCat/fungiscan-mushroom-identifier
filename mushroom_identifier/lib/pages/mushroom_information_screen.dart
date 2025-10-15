@@ -60,10 +60,12 @@ class MushroomInformationScreen extends StatelessWidget {
     final String lookAlike = mushroomData[DatabaseService.columnLookAlike] as String? ?? 'N/A';
     final String usages = mushroomData[DatabaseService.columnUsages] as String? ?? 'N/A';
     final String safetyTips = mushroomData[DatabaseService.columnSafetyTips] as String? ?? 'N/A';
+    final String mushroomName = _parseJsonField(basicInfoJson, 'common_name');
+
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mushroom Identification'),
+        title: Text(mushroomName),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -74,7 +76,6 @@ class MushroomInformationScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
             ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
               child: imageBytes != null
@@ -92,13 +93,11 @@ class MushroomInformationScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Confidence Score Section
             Text(
               'Confidence Score: ${confidenceScore * 100}%',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 16),
-            // Basic Information Section
             Text('Basic Information',style: Theme.of(context).textTheme.headlineSmall),
             const SizedBox(height: 8),
             _buildInfoBox(

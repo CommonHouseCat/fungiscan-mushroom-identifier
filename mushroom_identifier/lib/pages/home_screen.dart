@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Home"),
+        title: const Text('Mushroom Identifier'),
         centerTitle: false,
         actions: <Widget>[
           ThemeToggleButtonWidget(
@@ -104,6 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const Text(
+              'Pick an image from gallery or take a picture to identify mushrooms',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 50),
+
             ButtonComponent(
               label: "Gallery",
               fontSize: 20,
@@ -116,6 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
 
             const SizedBox(height: 20),
+
             Divider(
               height: 20,
               color: Colors.grey,
