@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mushroom_identifier/configs/themes/theme_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import '../components/button_component.dart';
 import '../components/theme_toggle_button.dart';
+import '../configs/themes/theme_provider.dart';
 import 'image_editor_screen.dart';
 
 class HomeScreen extends StatefulWidget {

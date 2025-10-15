@@ -1,6 +1,6 @@
+import 'package:FungiScan/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:mushroom_identifier/pages/splash_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
