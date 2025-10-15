@@ -104,15 +104,19 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
+        backgroundColor: colorScheme.tertiary,
         leading: IconButton(
-          icon: const Icon(Icons.close),
+          icon: Icon(Icons.close, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-              icon: const Icon(Icons.check),
+              icon: Icon(Icons.check, color: colorScheme.onSurface),
               onPressed: _save,
           ),
         ],
@@ -200,16 +204,17 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
         },
       ),
       bottomNavigationBar: BottomAppBar(
+        color: colorScheme.tertiary,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
-              icon: const Icon(Icons.rotate_left),
+              icon: Icon(Icons.rotate_left, color: colorScheme.onSurface),
               onPressed: _rotateLeft,
             ),
             Text('${(_zoom * 100).toInt()}%'),
             IconButton(
-              icon: const Icon(Icons.rotate_right),
+              icon: Icon(Icons.rotate_right, color: colorScheme.onSurface),
               onPressed: _rotateRight,
             ),
           ],

@@ -82,12 +82,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final colorScheme = Theme.of(context).colorScheme;
+
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Mushroom Identifier'),
+        backgroundColor: colorScheme.tertiary,
+        title: Text(
+          'Mushroom Identifier',
+          style: TextStyle(color: colorScheme.onSurface),
+        ),
         centerTitle: false,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
           ThemeToggleButtonWidget(
             isDarkMode: themeProvider.isDarkMode,
@@ -99,9 +106,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Pick an image from gallery or take a picture to identify mushrooms',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: colorScheme.onSurface),
               textAlign: TextAlign.center,
             ),
 
@@ -122,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             Divider(
               height: 20,
-              color: Colors.grey,
+              color: colorScheme.secondary,
               thickness: 2,
               indent: 20,
               endIndent: 20,

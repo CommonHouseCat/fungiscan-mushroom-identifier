@@ -30,7 +30,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
         transitionBuilder: (Widget child, Animation<double> animation) {
@@ -38,10 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
             parent: animation,
             curve: Curves.easeInOut,
           );
-          return FadeTransition(
-            opacity: curveAnimation,
-            child: child,
-          );
+          return FadeTransition(opacity: curveAnimation,child: child);
         },
         child: Stack(
           key: ValueKey<int>(_selectedIndex),
@@ -50,28 +50,21 @@ class _BottomNavBarState extends State<BottomNavBar> {
             Widget page = entry.value;
             return Offstage(
               offstage:_selectedIndex != index,
-              child: TickerMode(
-                enabled: _selectedIndex == index,
-                child: page,
-              ),
+              child: TickerMode(enabled: _selectedIndex == index, child: page),
             );
           }).toList(),
         )
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
+          backgroundColor: colorScheme.tertiary,
+          selectedItemColor: colorScheme.primary,
+          unselectedItemColor: colorScheme.onSurface.withAlpha((255 * 0.6).round()),
+          currentIndex: _selectedIndex,
         onTap: _navigateBottomBar,
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "Home"
-          ),
-
-          BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: "History"
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.history),label: "History"),
         ]
       )
     );

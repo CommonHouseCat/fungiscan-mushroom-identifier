@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../components/mushroom_info_item.dart';
 import '../services/database_service.dart';
 
@@ -80,20 +81,51 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _copyMushroom() async {
-    // does nothing for now
+  Future<void> _copyMushroom(Map<String, dynamic> mushroom) async {
+    try {
+      final buffer = StringBuffer()
+        ..writeln('🧠 Confidence Score: ${((mushroom[DatabaseService.columnConfidenceScore] as double) * 100).toStringAsFixed(2)}%')
+        ..writeln('\n📘 Basic Information:')
+        ..writeln(mushroom[DatabaseService.columnBasicInfo])
+        ..writeln('\n🧩 Physical Characteristics:')
+        ..writeln(mushroom[DatabaseService.columnPhysicalCharacteristics])
+        ..writeln('\n🔍 Look-Alike:')
+        ..writeln(mushroom[DatabaseService.columnLookAlike])
+        ..writeln('\n🍄 Usages:')
+        ..writeln(mushroom[DatabaseService.columnUsages])
+        ..writeln('\n⚠️ Safety Tips:')
+        ..writeln(mushroom[DatabaseService.columnSafetyTips]);
+
+      await Clipboard.setData(ClipboardData(text: buffer.toString()));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Mushroom information copied to clipboard.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error copying mushroom info: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to copy: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
-  Future<void> _shareMushroom() async {
-    // does nothing for now
-  }
 
-  // Helper widget to build the body
   Widget _buildBody() {
-    // Loading Icon
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     if (_isLoading) return const Center(child: CircularProgressIndicator());
 
-    // Show error message and retry button
     if (_errorMessage.isNotEmpty) {
       return Center(
         child: Column(
@@ -101,24 +133,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             Text(
               _errorMessage,
-              style: const TextStyle(color: Colors.red, fontSize: 16),
+              style: textTheme.bodyMedium?.copyWith(color: Colors.red),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _fetchMushroomInfoHistory,
-              child: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+              ),
+              child: Text('Retry',style: TextStyle(color: colorScheme.onPrimary)),
             ),
           ],
         ),
       );
     }
 
-    // Show this if no entry is found
     if (_mushroomInfoHistory.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No mushroom entries found.',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
           textAlign: TextAlign.center,
         ),
       );
@@ -145,8 +180,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           key: ValueKey(itemId),
           item: item,
           onDelete: () => _deleteMushroom(itemId, index),
-          onCopy: _copyMushroom,
-          onShare: _shareMushroom,
+          onCopy: () => _copyMushroom(item),
         );
       },
     );
@@ -154,13 +188,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text("History"),
+        backgroundColor: colorScheme.tertiary,
+        title: Text(
+          "History",
+          style: TextStyle(color: colorScheme.onSurface),
+        ),
         centerTitle: false,
         actions: <Widget>[
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh, color: colorScheme.onSurface),
             onPressed: _isLoading ? null : _fetchMushroomInfoHistory,
             tooltip: 'Refresh History',
           ),

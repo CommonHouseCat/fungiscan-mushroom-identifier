@@ -29,8 +29,7 @@ dev_dependencies:
 flutter:
   assets:
     - assets/.
-    - assets/sample/error.jpg
-    - assets/sample/sample.jpg
+    - assets/error.jpg
     - assets/labels.txt
     - assets/mushroom_info.json
     - .env

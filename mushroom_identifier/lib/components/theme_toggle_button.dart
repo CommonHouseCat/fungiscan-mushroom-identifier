@@ -15,7 +15,7 @@ class ThemeToggleButtonWidget extends StatelessWidget {
     return IconButton(
       icon: Icon(
         isDarkMode ? Icons.dark_mode : Icons.light_mode,
-        color: Theme.of(context).colorScheme.inversePrimary,
+        color: Theme.of(context).colorScheme.primary,
       ),
       onPressed: onPressed,
       tooltip: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',

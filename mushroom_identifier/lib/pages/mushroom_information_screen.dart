@@ -61,13 +61,16 @@ class MushroomInformationScreen extends StatelessWidget {
     final String usages = mushroomData[DatabaseService.columnUsages] as String? ?? 'N/A';
     final String safetyTips = mushroomData[DatabaseService.columnSafetyTips] as String? ?? 'N/A';
     final String mushroomName = _parseJsonField(basicInfoJson, 'common_name');
-
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: Text(mushroomName),
+        backgroundColor: colorScheme.tertiary,
+        title: Text(mushroomName, style: TextStyle(color: colorScheme.onSurface)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -95,10 +98,10 @@ class MushroomInformationScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Confidence Score: ${confidenceScore * 100}%',
-              style: Theme.of(context).textTheme.headlineSmall,
+              style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface),
             ),
             const SizedBox(height: 16),
-            Text('Basic Information',style: Theme.of(context).textTheme.headlineSmall),
+            Text('Basic Information',style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(
               children: [
@@ -110,19 +113,19 @@ class MushroomInformationScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            Text('Physical Characteristics', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Physical Characteristics', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(children: [_buildBulletPoint('', physicalCharacteristics)]),
             const SizedBox(height: 16),
-            Text('Look Alike', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Look Alike', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(children: [_buildBulletPoint('', lookAlike)]),
             const SizedBox(height: 16),
-            Text('Usages', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Usages', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(children: [_buildBulletPoint('', usages)]),
             const SizedBox(height: 16),
-            Text('Safety Tips', style: Theme.of(context).textTheme.headlineSmall),
+            Text('Safety Tips', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(children: [_buildBulletPoint('', safetyTips)]),
           ],

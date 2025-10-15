@@ -8,14 +8,12 @@ class MushroomInfoItem extends StatelessWidget {
   final Map<String, dynamic> item;
   final VoidCallback onDelete;
   final VoidCallback onCopy;
-  final VoidCallback onShare;
 
   const MushroomInfoItem({
     super.key,
     required this.item,
     required this.onDelete,
     required this.onCopy,
-    required this.onShare,
   });
 
   void _onItemTap(BuildContext context) {
@@ -29,6 +27,7 @@ class MushroomInfoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final Uint8List? imageBytes = item[DatabaseService.columnImage] as Uint8List?;
 
     String mushroomName = 'Unknown Mushroom';
@@ -45,6 +44,7 @@ class MushroomInfoItem extends StatelessWidget {
     }
 
     return Card(
+      color: colorScheme.tertiary,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
@@ -77,7 +77,7 @@ class MushroomInfoItem extends StatelessWidget {
                 Expanded(
                   child: Text(
                     mushroomName,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorScheme.onSurface),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.start,
@@ -85,29 +85,20 @@ class MushroomInfoItem extends StatelessWidget {
                 ),
                 const Spacer(),
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.black),
+                  icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
                   onSelected: (value) {
                     if (value == 'delete') {
                       onDelete();
                     } else if (value == 'copy') {
                       onCopy();
-                    } else if (value == 'share') {
-                      onShare();
                     }
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
                       value: 'copy',
                       child: ListTile(
-                        leading: Icon(Icons.copy, color: Colors.black),
-                        title: Text('Copy', style: TextStyle(color: Colors.black)),
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'share',
-                      child: ListTile(
-                        leading: Icon(Icons.share, color: Colors.black),
-                        title: Text('Share', style: TextStyle(color: Colors.black)),
+                        leading: Icon(Icons.copy, color: colorScheme.onSurface),
+                        title: Text('Copy', style: TextStyle(color: colorScheme.onSurface)),
                       ),
                     ),
                     const PopupMenuItem<String>(

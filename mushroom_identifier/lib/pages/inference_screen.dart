@@ -42,7 +42,7 @@ class _InferenceScreenState extends State<InferenceScreen> {
     super.initState();
     _runInference();
   }
-  
+
   Future<void> _runInference() async {
     try {
       final dio = Dio();
@@ -89,6 +89,7 @@ class _InferenceScreenState extends State<InferenceScreen> {
 
       await _cleanup();
 
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -116,19 +117,40 @@ class _InferenceScreenState extends State<InferenceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Running inference")),
+      backgroundColor: colorScheme.surface,
+      appBar: AppBar(
+          title: Text(
+              "Running inference",
+              style: TextStyle(color: colorScheme.onSurface),
+          ),
+        backgroundColor: colorScheme.tertiary,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
+      ),
       body: Center(
         child: _isLoading
-            ? const CircularProgressIndicator()
+            ? CircularProgressIndicator(color: colorScheme.primary)
             : _error != null
             ? Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text("Error: $_error"),
+            Text(
+              "Error: $_error",
+              style: TextStyle(color: colorScheme.onSurface),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colorScheme.primary,
+              ),
               onPressed: () => Navigator.pop(context),
-              child: const Text('Back'),
+              child: Text(
+                'Back',
+                style: TextStyle(color: colorScheme.onPrimary),
+              ),
             ),
           ],
         )

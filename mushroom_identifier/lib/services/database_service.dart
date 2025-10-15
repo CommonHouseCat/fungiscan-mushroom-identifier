@@ -88,5 +88,4 @@ class DatabaseService {
       columnDateOfCreation: DateTime.now().toIso8601String(),
     });
   }
-
 }
