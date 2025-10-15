@@ -10,14 +10,15 @@ class ThemeToggleButtonWidget extends StatelessWidget {
     required this.onPressed,
   });
 
-  // --- Methods to Toggle State (kept in HomeScreen for now) ---
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(isDarkMode ? Icons.nightlight_round : Icons.wb_sunny),
-      tooltip: 'Toggle Theme',
+      icon: Icon(
+        isDarkMode ? Icons.dark_mode : Icons.light_mode,
+        color: Theme.of(context).colorScheme.inversePrimary,
+      ),
       onPressed: onPressed,
+      tooltip: isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
     );
   }
 }

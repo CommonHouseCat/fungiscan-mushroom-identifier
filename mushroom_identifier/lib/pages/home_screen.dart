@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mushroom_identifier/configs/themes/theme_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
 import '../components/button_component.dart';
 import '../components/theme_toggle_button.dart';
 import 'image_editor_screen.dart';
@@ -13,15 +15,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // --- State Variables (kept in HomeScreen for now) ---
-  bool _isDarkMode = false;
-
-  // --- Methods to Toggle State (kept in HomeScreen for now) ---
-  void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
-  }
 
   Future<void> _openGallery() async {
     var status = await Permission.photos.request();
@@ -63,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Open app settings if permission is  denied
   void _openAppSettings() {
     showDialog(
       context: context,
@@ -89,14 +81,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: const Text('Mushroom Identifier'),
         centerTitle: false,
-        actions: <Widget>[
+        actions: [
           ThemeToggleButtonWidget(
-            isDarkMode: _isDarkMode,
-            onPressed: _toggleTheme,
+            isDarkMode: themeProvider.isDarkMode,
+            onPressed: themeProvider.toggleTheme,
           ),
         ],
       ),
@@ -110,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
               textAlign: TextAlign.center,
             ),
 
-            const SizedBox(height: 50),
+            const SizedBox(height: 80),
 
             ButtonComponent(
               label: "Gallery",
