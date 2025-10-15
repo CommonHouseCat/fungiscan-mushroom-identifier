@@ -19,11 +19,11 @@ class MushroomInformationScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildInfoBox({required List<Widget> children}) {
+  Widget _buildInfoBox({required BuildContext context, required List<Widget> children}) {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Theme.of(context).colorScheme.tertiary,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Column(
@@ -104,6 +104,7 @@ class MushroomInformationScreen extends StatelessWidget {
             Text('Basic Information',style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
             _buildInfoBox(
+              context: context,
               children: [
                 _buildBulletPoint('Mushroom Name', _parseJsonField(basicInfoJson, 'common_name')),
                 _buildBulletPoint('Scientific Name', _parseJsonField(basicInfoJson, 'scientific_name')),
@@ -115,19 +116,19 @@ class MushroomInformationScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text('Physical Characteristics', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(children: [_buildBulletPoint('', physicalCharacteristics)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', physicalCharacteristics)]),
             const SizedBox(height: 16),
             Text('Look Alike', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(children: [_buildBulletPoint('', lookAlike)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', lookAlike)]),
             const SizedBox(height: 16),
             Text('Usages', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(children: [_buildBulletPoint('', usages)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', usages)]),
             const SizedBox(height: 16),
             Text('Safety Tips', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(children: [_buildBulletPoint('', safetyTips)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', safetyTips)]),
           ],
         ),
       ),

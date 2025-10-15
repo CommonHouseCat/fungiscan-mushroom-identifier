@@ -33,15 +33,17 @@ class ButtonComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: buttonColor,
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.6),
         fixedSize: Size(width, height),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
           side: BorderSide(
-              color: borderColor,
+            color: colorScheme.secondary,
               width: borderWidth,
           ),
         ),
@@ -56,7 +58,7 @@ class ButtonComponent extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Icon(
                 icon,
-                color: iconColor,
+                color: colorScheme.onPrimary,
                 size: iconSize,
               ),
             )
@@ -64,7 +66,7 @@ class ButtonComponent extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: textColor,
+              color: colorScheme.onPrimary,
               fontSize: fontSize.toDouble(),
             ),
             textAlign: TextAlign.center,

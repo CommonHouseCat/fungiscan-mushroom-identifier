@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             Divider(
               height: 20,
-              color: colorScheme.secondary,
+              color: Colors.grey,
               thickness: 2,
               indent: 20,
               endIndent: 20,
