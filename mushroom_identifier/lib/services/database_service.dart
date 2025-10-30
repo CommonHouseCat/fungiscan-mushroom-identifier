@@ -27,6 +27,7 @@ class DatabaseService {
   static const String columnUsages = 'usages';
   static const String columnSafetyTips = 'safety_tips';
   static const String columnDateOfCreation = 'date_of_creation';
+  static const String columnIsBookMark = 'is_bookmark';
 
   Future<Database> _initDatabase() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -34,7 +35,7 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE $tableMushrooms (
@@ -46,9 +47,18 @@ class DatabaseService {
             $columnLookAlike TEXT,
             $columnUsages TEXT,
             $columnSafetyTips TEXT,
-            $columnDateOfCreation TEXT            
+            $columnDateOfCreation TEXT,
+            $columnIsBookMark INTEGER DEFAULT 0            
           )
         ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            ALTER TABLE $tableMushrooms
+            ADD COLUMN $columnIsBookMark INTEGER DEFAULT 0
+          ''');
+        }
       },
     );
   }
@@ -86,6 +96,17 @@ class DatabaseService {
       columnUsages: usages,
       columnSafetyTips: safetyTips,
       columnDateOfCreation: DateTime.now().toIso8601String(),
+      columnIsBookMark: 0,
     });
+  }
+
+  Future<void> toggleBookmark(int id, bool currentState) async {
+    final db = await database;
+    await db.update(
+      tableMushrooms,
+      {columnIsBookMark: currentState ? 0 : 1},
+      where: '$columnId = ?',
+      whereArgs: [id],
+    );
   }
 }

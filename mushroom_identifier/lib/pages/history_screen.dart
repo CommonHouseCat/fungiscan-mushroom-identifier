@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/mushroom_info_item.dart';
 import '../services/database_service.dart';
+import 'dart:convert';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -15,12 +17,94 @@ class _HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, dynamic>> _mushroomInfoHistory = [];
   bool _isLoading = true;
   String _errorMessage = '';
+  String _sortType = 'Date';
+
 
   @override
   void initState() {
     super.initState();
     _databaseService = DatabaseService();
+    _loadSortPreference();
     _fetchMushroomInfoHistory();
+  }
+
+  void _sortHistory() {
+    _mushroomInfoHistory.sort((a, b) {
+      final aBookmark = a[DatabaseService.columnIsBookMark] == 1;
+      final bBookmark = b[DatabaseService.columnIsBookMark] == 1;
+
+      if (aBookmark != bBookmark) {
+        return bBookmark ? 1 : -1;
+      }
+
+      if (_sortType == 'Name') {
+        final aName = _extractName(a[DatabaseService.columnBasicInfo]);
+        final bName = _extractName(b[DatabaseService.columnBasicInfo]);
+        return aName.compareTo(bName);
+      } else {
+        final aDate = DateTime.parse(a[DatabaseService.columnDateOfCreation]);
+        final bDate = DateTime.parse(b[DatabaseService.columnDateOfCreation]);
+        return bDate.compareTo(aDate);
+      }
+    });
+  }
+
+
+  String _extractName(String? basicInfo) {
+    if (basicInfo == null) return '';
+    try {
+      final map = jsonDecode(basicInfo);
+      return map['common_name'] ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  Future<void> _loadSortPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedSort = prefs.getString('sortType');
+    if (savedSort != null && mounted) {
+      setState(() {
+        _sortType = savedSort;
+      });
+    }
+  }
+
+  Future<void> _toggleBookmark(int id, int index) async {
+    try {
+      // Find actual item by ID to prevent wrong toggling after sorting
+      final int itemIndex = _mushroomInfoHistory.indexWhere(
+              (item) => item[DatabaseService.columnId] == id);
+      if (itemIndex == -1) return; // safety check
+
+      final currentState =
+          _mushroomInfoHistory[itemIndex][DatabaseService.columnIsBookMark] == 1;
+
+      // Update database first
+      await _databaseService.toggleBookmark(id, currentState);
+
+      // Update in-memory list safely
+      setState(() {
+        _mushroomInfoHistory[itemIndex] = {
+          ..._mushroomInfoHistory[itemIndex],
+          DatabaseService.columnIsBookMark: currentState ? 0 : 1,
+        };
+
+        // Ensure bookmarked items always appear first
+        _mushroomInfoHistory.sort((a, b) {
+          final int aBookmark = a[DatabaseService.columnIsBookMark] ?? 0;
+          final int bBookmark = b[DatabaseService.columnIsBookMark] ?? 0;
+          if (aBookmark != bBookmark) return bBookmark - aBookmark;
+          final aDate =
+          DateTime.parse(a[DatabaseService.columnDateOfCreation]);
+          final bDate =
+          DateTime.parse(b[DatabaseService.columnDateOfCreation]);
+          return bDate.compareTo(aDate);
+        });
+      });
+    } catch (e) {
+      debugPrint("Error toggling bookmark: $e");
+    }
   }
 
   Future<void> _fetchMushroomInfoHistory() async {
@@ -35,6 +119,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (mounted) {
         setState(() {
           _mushroomInfoHistory = List<Map<String, dynamic>>.from(data);
+          _sortHistory();
           _isLoading = false;
         });
       }
@@ -119,7 +204,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -159,30 +243,67 @@ class _HistoryScreenState extends State<HistoryScreen> {
       );
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(8.0),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 8.0,
-        mainAxisSpacing: 8.0,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: _mushroomInfoHistory.length,
-      itemBuilder: (context, index) {
-        final item = _mushroomInfoHistory[index];
-        final int? itemId = item[DatabaseService.columnId] as int?;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0,16.0, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'Sort by:',
+                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+              ),
+              const SizedBox(width: 8.0),
+              DropdownButton<String>(
+                  value: _sortType,
+                  items: [
+                    DropdownMenuItem(value: 'Date', child: Text('Date', style: TextStyle(color: colorScheme.onSurface))),
+                    DropdownMenuItem(value: 'Name', child: Text('Name', style: TextStyle(color: colorScheme.onSurface))),
+                  ],
+                  onChanged: (value) async {
+                    if (value == null) return;
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setString('sortType', value);
 
-        if (itemId == null) {
-          return const ListTile(title: Text('Error: Invalid ID'));
-        }
+                    setState(() {
+                      _sortType = value;
+                      _sortHistory();
+                    });
+                  }
+              ),
+            ],
+          ),
+        ),
 
-        return MushroomInfoItem(
-          key: ValueKey(itemId),
-          item: item,
-          onDelete: () => _deleteMushroom(itemId, index),
-          onCopy: () => _copyMushroom(item),
-        );
-      },
+        Expanded(
+          child: GridView.builder(
+            padding: const EdgeInsets.all(8.0),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: _mushroomInfoHistory.length,
+            itemBuilder: (context, index) {
+              final item = _mushroomInfoHistory[index];
+              final int? itemId = item[DatabaseService.columnId] as int?;
+              if (itemId == null) {
+                return const ListTile(title: Text('Error: Invalid ID'));
+              }
+
+              return MushroomInfoItem(
+                key: ValueKey(itemId),
+                item: item,
+                onDelete: () => _deleteMushroom(itemId, index),
+                onCopy: () => _copyMushroom(item),
+                onToggleBookmark: () => _toggleBookmark(itemId, index),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -198,7 +319,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           "History",
           style: TextStyle(color: colorScheme.onSurface),
         ),
-        centerTitle: false,
+        centerTitle: true,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.refresh, color: colorScheme.onSurface),

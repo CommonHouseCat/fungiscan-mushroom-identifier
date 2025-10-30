@@ -8,27 +8,30 @@ class MushroomInfoItem extends StatelessWidget {
   final Map<String, dynamic> item;
   final VoidCallback onDelete;
   final VoidCallback onCopy;
+  final VoidCallback onToggleBookmark;
 
   const MushroomInfoItem({
     super.key,
     required this.item,
     required this.onDelete,
     required this.onCopy,
+    required this.onToggleBookmark,
   });
 
   void _onItemTap(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MushroomInformationScreen(mushroomData: item),
-        ),
+      context,
+      MaterialPageRoute(
+        builder: (context) => MushroomInformationScreen(mushroomData: item),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final Uint8List? imageBytes = item[DatabaseService.columnImage] as Uint8List?;
+    final Uint8List? imageBytes =
+        item[DatabaseService.columnImage] as Uint8List?;
 
     String mushroomName = 'Unknown Mushroom';
     final dynamic basicInfo = item[DatabaseService.columnBasicInfo];
@@ -36,7 +39,8 @@ class MushroomInfoItem extends StatelessWidget {
     if (basicInfo != null && basicInfo is String) {
       try {
         final Map<String, dynamic> parsedBasicInfo = jsonDecode(basicInfo);
-        mushroomName = parsedBasicInfo['common_name'] as String? ?? 'Unknown Mushroom';
+        mushroomName =
+            parsedBasicInfo['common_name'] as String? ?? 'Unknown Mushroom';
       } catch (e) {
         debugPrint('Error parsing JSON in MushroomInfoItem: $e');
         mushroomName = 'Error Reading Name';
@@ -52,24 +56,41 @@ class MushroomInfoItem extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GestureDetector(
-              onTap: () => _onItemTap(context),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.0),
-                child: imageBytes != null
-                  ? Image.memory(
-                      imageBytes,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 150,
-                    )
-                  : Image.asset(
-                      'assets/sample/error.jpg',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: 150,
+            Stack(
+              children: [
+                GestureDetector(
+                  onTap: () => _onItemTap(context),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: imageBytes != null
+                        ? Image.memory(
+                            imageBytes,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 150,
+                          )
+                        : Image.asset(
+                            'assets/sample/error.jpg',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: 150,
+                          ),
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: Icon(
+                      item[DatabaseService.columnIsBookMark] == 1
+                          ? Icons.bookmark
+                          : Icons.bookmark_border,
+                      color: Colors.white,
                     ),
-              ),
+                    onPressed: onToggleBookmark,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Row(
@@ -77,13 +98,16 @@ class MushroomInfoItem extends StatelessWidget {
                 Expanded(
                   child: Text(
                     mushroomName,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: colorScheme.onSurface),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: colorScheme.onSurface,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.start,
                   ),
                 ),
-                const Spacer(),
                 PopupMenuButton<String>(
                   icon: Icon(Icons.more_vert, color: colorScheme.onSurface),
                   onSelected: (value) {
@@ -93,22 +117,32 @@ class MushroomInfoItem extends StatelessWidget {
                       onCopy();
                     }
                   },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    PopupMenuItem<String>(
-                      value: 'copy',
-                      child: ListTile(
-                        leading: Icon(Icons.copy, color: colorScheme.onSurface),
-                        title: Text('Copy', style: TextStyle(color: colorScheme.onSurface)),
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'delete',
-                      child: ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text('Delete', style: TextStyle(color: Colors.red)),
-                      ),
-                    ),
-                  ],
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                        PopupMenuItem<String>(
+                          value: 'copy',
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.copy,
+                              color: colorScheme.onSurface,
+                            ),
+                            title: Text(
+                              'Copy',
+                              style: TextStyle(color: colorScheme.onSurface),
+                            ),
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'delete',
+                          child: ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text(
+                              'Delete',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                      ],
                 ),
               ],
             ),

@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Mushroom Identifier',
           style: TextStyle(color: colorScheme.onSurface),
         ),
-        centerTitle: false,
+        centerTitle: true,
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         actions: [
           ThemeToggleButtonWidget(

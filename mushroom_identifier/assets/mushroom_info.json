@@ -311,9 +311,9 @@
     "usages": "Limited culinary use - only the egg stage is occasionally eaten. Mainly of interest to naturalists and photographers due to unusual appearance.",
     "safety_tips": "If collecting egg stage for eating, cut open to ensure it's a stinkhorn egg (jelly-like layer surrounding developing structure) and not a young Amanita. Cook thoroughly. Most people find the mature odor too offensive to consider eating."
   },
-  "dotted_stemmed_bolete": {
+  "dotted_stem_bolete": {
     "basic_info": {
-      "common_name": "Dotted Stemmed Bolete",
+      "common_name": "Dotted Stem Bolete",
       "scientific_name": "Neoboletus luridiformis",
       "edibility": "Edible when cooked, but requires thorough cooking. Raw or undercooked can cause gastrointestinal upset. Valued edible in some regions.",
       "toxicity_level": "Edible when cooked",
@@ -521,7 +521,7 @@
   },
   "jelly_tooth": {
     "basic_info": {
-      "common_name": "Jelly Tooth",
+      "common_name": "Toothed Jelly Fungus",
       "scientific_name": "Pseudohydnum gelatinosum",
       "edibility": "Edible but texture may not appeal to everyone. Mild flavor, interesting gelatinous texture.",
       "toxicity_level": "Edible",
