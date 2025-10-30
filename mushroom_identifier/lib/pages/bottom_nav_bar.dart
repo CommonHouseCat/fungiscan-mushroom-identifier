@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'home_screen.dart';
 import 'history_screen.dart';
 
@@ -10,63 +11,75 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
+  late PageController _pageController;
   int _selectedIndex = 0;
-
-  void _navigateBottomBar(int index) {
-    if (_selectedIndex != index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
-
-  late final List<Widget> _pages;
 
   @override
   void initState() {
-    _pages = [const HomeScreen(), const HistoryScreen()];
+    _pageController = PageController(initialPage: 0);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildNavItem(IconData icon, int index, ColorScheme colorScheme) {
+    final bool isSelected = _selectedIndex == index;
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        setState(() => _selectedIndex = index);
+        _pageController.jumpToPage(index);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? colorScheme.primary.withValues(alpha:0.15)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Icon(
+          icon,
+          color: isSelected
+              ? colorScheme.primary
+              : colorScheme.onSurface.withValues(alpha:0.7),
+          size: 30,
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          final curveAnimation = CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeInOut,
-          );
-          return FadeTransition(opacity: curveAnimation,child: child);
-        },
-        child: Stack(
-          key: ValueKey<int>(_selectedIndex),
-          children: _pages.asMap().entries.map((entry) {
-            int index = entry.key;
-            Widget page = entry.value;
-            return Offstage(
-              offstage:_selectedIndex != index,
-              child: TickerMode(enabled: _selectedIndex == index, child: page),
-            );
-          }).toList(),
-        )
+    return BottomBar(
+      borderRadius: BorderRadius.circular(25),
+      duration: const Duration(milliseconds: 400),
+      barColor: colorScheme.tertiary.withValues(alpha: 0.9),
+      body: (context, controller) => PageView(
+        controller: _pageController,
+        onPageChanged: (index) => setState(() => _selectedIndex = index),
+        children: const [
+          HomeScreen(),
+          HistoryScreen(),
+        ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-          backgroundColor: colorScheme.tertiary,
-          selectedItemColor: colorScheme.primary,
-          unselectedItemColor: colorScheme.onSurface.withAlpha((255 * 0.6).round()),
-          currentIndex: _selectedIndex,
-        onTap: _navigateBottomBar,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home),label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.history),label: "History"),
-        ]
-      )
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 65),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavItem(Icons.home, 0, colorScheme),
+            _buildNavItem(Icons.history, 1, colorScheme),
+          ],
+        ),
+      ),
     );
   }
 }
