@@ -38,7 +38,7 @@ class ButtonComponent extends StatelessWidget {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary.withValues(alpha: 0.6),
+          backgroundColor: colorScheme.primary.withValues(alpha: 0.35),
         fixedSize: Size(width, height),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

@@ -123,6 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: _openGallery,
               width: 300,
               height: 150,
+              borderWidth: 2.0,
             ),
 
             const SizedBox(height: 20),
@@ -145,6 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: _openCamera,
               width: 300,
               height: 150,
+              borderWidth: 2.0,
             ),
           ],
         ),

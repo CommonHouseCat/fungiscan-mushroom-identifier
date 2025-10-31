@@ -283,7 +283,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 8.0,
               mainAxisSpacing: 8.0,
-              childAspectRatio: 0.75,
+              childAspectRatio: 1.05,
             ),
             itemCount: _mushroomInfoHistory.length,
             itemBuilder: (context, index) {
