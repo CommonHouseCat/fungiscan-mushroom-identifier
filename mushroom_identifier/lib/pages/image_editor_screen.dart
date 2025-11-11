@@ -91,7 +91,20 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     } catch (e) {
       if(!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving image: $e')),
+        SnackBar(
+          content: Text('Error saving image: $e'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2, microseconds: 100),
+          margin: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 80,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       );
     } finally {
       if (mounted) {

@@ -1,4 +1,17 @@
 {
+  "amethyst_chanterelle": {
+    "basic_info": {
+      "common_name": "Amethyst Chanterelle",
+      "scientific_name": "Cantharellus amethysteus",
+      "edibility": "Edible and excellent quality. Highly prized for its flavor and unique coloration.",
+      "toxicity_level": "Choice Edible",
+      "habitat": "Found in deciduous woodlands, particularly under beech and oak trees. Grows on the ground in mossy areas, often in small groups."
+    },
+    "physical_characteristics": "Medium-sized chanterelle with distinctive violet to amethyst coloration on the cap surface. Cap 3-10cm across, funnel-shaped with wavy margin. Has characteristic chanterelle false gills that are thick, fold-like, and run down the stem. Flesh is white to pale yellow with fruity aroma.",
+    "look_alike": "Could be confused with other chanterelle species, but the amethyst coloration is distinctive. The poisonous Jack O'Lantern mushroom has true gills and grows in clusters on wood rather than singly on ground.",
+    "usages": "Highly valued culinary mushroom with excellent flavor and aroma. Can be sautéed, used in sauces, or dried for preservation. Popular in gourmet cooking for both flavor and visual appeal.",
+    "safety_tips": "Ensure positive identification by checking for false gills and fruity aroma. Only collect from clean, unpolluted areas. Clean thoroughly and cook before eating."
+  },
   "amethyst_deceiver": {
     "basic_info": {
       "common_name": "Amethyst Deceiver",
@@ -11,19 +24,6 @@
     "look_alike": "Could be confused with other purple mushrooms like the poisonous Lilac Fibrecap (Cortinarius traganus), which has rust-brown spore prints and a cobweb-like veil. The deceiver fades to buff color when old.",
     "usages": "Primarily culinary - can be used in cooking but has mild flavor. Often used for color in dishes. Should be thoroughly cooked.",
     "safety_tips": "Only collect from unpolluted areas due to heavy metal absorption. Ensure positive identification as it can fade and resemble other species when older."
-  },
-  "aniseed_funnel": {
-    "basic_info": {
-      "common_name": "Aniseed Funnel",
-      "scientific_name": "Clitocybe odora",
-      "edibility": "Edible but strong flavor. The intense aniseed aroma makes it better as a flavoring agent than a main vegetable.",
-      "toxicity_level": "Edible",
-      "habitat": "Grows in deciduous and coniferous woodlands, often in leaf litter. Found in Europe and North America, typically in late summer to autumn."
-    },
-    "physical_characteristics": "Small to medium funnel-shaped cap with distinctive blue-green color and strong aniseed aroma. Cap is 3-8cm across, initially convex then developing a deep depression. Gills are pale and run down the stem.",
-    "look_alike": "Similar to other funnel caps but distinguished by its unique aniseed smell and blue-green coloration. Could be confused with the poisonous Verdigris Funnel (Clitocybe sp.) but smell is key identifier.",
-    "usages": "Culinary - used as a flavoring agent due to strong aniseed aroma. Can be dried for later use. Sometimes used to flavor alcoholic beverages.",
-    "safety_tips": "Always identify by smell. Do not consume if there's any doubt about identification. Cook thoroughly before consumption."
   },
   "beechwood_sickener": {
     "basic_info": {
@@ -51,6 +51,19 @@
     "usages": "Culinary - can be cooked like meat, sliced thin and fried. Young specimens are best. Has been used as a meat substitute. Also used in traditional medicine for various ailments.",
     "safety_tips": "Only consume young, tender specimens. Cook thoroughly. Avoid specimens growing on toxic trees like yew. Ensure proper identification as it can stain hands red."
   },
+  "black_morel": {
+    "basic_info": {
+      "common_name": "Black Morel",
+      "scientific_name": "Morchella elata",
+      "edibility": "Choice edible when cooked. Excellent flavor but must be thoroughly cooked to destroy toxins.",
+      "toxicity_level": "Choice Edible when cooked",
+      "habitat": "Found in coniferous and mixed woodlands, often in burned areas or disturbed ground. Particularly common under ash and apple trees in spring."
+    },
+    "physical_characteristics": "Distinctive morel with dark brown to black, honeycombed cap. Cap 5-15cm tall with vertical ridges and pits. Entire mushroom hollow. Stem is white to cream-colored, often with granular texture. Cap attaches directly to stem without overhang.",
+    "look_alike": "Similar to other morel species but distinguished by darker coloration. False morels have brain-like rather than honeycomb appearance and are not completely hollow. The cap attachment is crucial for identification.",
+    "usages": "Highly prized culinary mushroom with rich, earthy flavor. Excellent sautéed, in sauces, or stuffed. Must be cooked thoroughly - never eat raw. Often dried for long-term storage.",
+    "safety_tips": "Always cook thoroughly to destroy heat-sensitive toxins. Confirm identification by checking hollow interior and honeycomb pattern. Clean thoroughly as insects hide in pits. Avoid alcohol consumption when eating morels."
+  },
   "blusher": {
     "basic_info": {
       "common_name": "The Blusher",
@@ -76,19 +89,6 @@
     "look_alike": "Similar to other dark-capped boletes like Boletus regineus (Queen Bolete). Could be confused with bitter boletes but distinguished by its pleasant smell and taste. The edible Bay Bolete is smaller and has a lighter cap.",
     "usages": "Highly valued culinary mushroom with excellent flavor and texture. Used in various dishes including risottos, pasta, and saut\u00e9ed preparations. Often dried for preservation.",
     "safety_tips": "Ensure positive identification as some boletes are toxic. Check that flesh doesn't bruise blue intensely and has no bitter taste. Clean thoroughly as pores can harbor insects."
-  },
-  "buttery_collybia": {
-    "basic_info": {
-      "common_name": "Buttery Collybia",
-      "scientific_name": "Rhodocollybia butyracea",
-      "edibility": "Edible but mediocre quality. Texture can be tough and flavor is mild. Often considered not worth collecting.",
-      "toxicity_level": "Edible",
-      "habitat": "Grows in coniferous and mixed woodlands, often in large troops. Common under pine and spruce trees. Appears from late summer to late autumn."
-    },
-    "physical_characteristics": "Medium-sized mushroom with a distinctive greasy or buttery feel when moist. Cap is 3-8cm, convex then flattening, brownish with darker center. Stem is tall, slender, and tough. Gills are white and crowded.",
-    "look_alike": "Similar to other Collybia species. Could be confused with the Spotted Toughshank (Rhodocollybia maculata) which has spotted gills. The greasy cap surface is a key identifier when moist.",
-    "usages": "Limited culinary use due to tough texture. Sometimes used in soups or stews where long cooking can tenderize it. Not considered a prime edible species.",
-    "safety_tips": "Ensure proper identification as it resembles some tougher, inedible species. Cook thoroughly to improve texture. Only collect young specimens as older ones become very tough."
   },
   "cauliflower_fungus": {
     "basic_info": {
@@ -141,19 +141,6 @@
     "look_alike": "Similar to other bracket fungi but distinctive coloring makes confusion unlikely. Laetiporus cincinnatus has pinkish-orange colors and grows at the base of trees. Both are edible. Avoid if growing on conifers or eucalyptus.",
     "usages": "Popular culinary mushroom used as chicken substitute. Can be breaded and fried, used in stir-fries, or added to soups. Young, tender margins are best. Can be par-cooked and frozen.",
     "safety_tips": "Only collect from hardwoods (avoid yew, eucalyptus, and conifers). Test sensitivity with small portion first - some people experience mild reactions. Use only young, tender specimens. Cook thoroughly."
-  },
-  "clouded_agaric": {
-    "basic_info": {
-      "common_name": "Clouded Agaric",
-      "scientific_name": "Clitocybe nebularis",
-      "edibility": "Edibility controversial - considered poisonous by some, edible by others. Causes gastrointestinal distress in many people. Best avoided.",
-      "toxicity_level": "Suspected Poisonous",
-      "habitat": "Grows in large troops and fairy rings in deciduous and coniferous woodlands. Common in leaf litter. Appears in late autumn."
-    },
-    "physical_characteristics": "Medium to large mushroom with pale grey to brownish-grey cap that is convex then depressed. Cap 5-15cm with inrolled margin. Gills are pale and decurrent. Stem is thick and paler than cap. Has a strong, unpleasant odor.",
-    "look_alike": "Similar to other Clitocybe species. Could be confused with edible Wood Blewit (Lepista nuda) which has lilac tones and different gill attachment. The smell and grey coloration are key identifiers.",
-    "usages": "Not recommended for consumption due to toxicity concerns. Some traditional uses in folk medicine but not scientifically validated. Best left for wildlife.",
-    "safety_tips": "Avoid consumption due to unpredictable reactions. Can cause severe gastrointestinal illness. Do not confuse with edible look-alikes. The unpleasant smell is a warning sign."
   },
   "common_earthballs": {
     "basic_info": {
@@ -389,19 +376,6 @@
     "usages": "Historically used as an insecticide (to kill flies) and in shamanic rituals for its psychoactive properties. Not recommended for any use today.",
     "safety_tips": "Avoid ingestion entirely. It is not a mushroom for foraging or experimentation. If consumed, seek immediate medical attention and bring a sample of the mushroom for identification."
   },
-  "fools_funnel": {
-    "basic_info": {
-      "common_name": "Fool's Funnel",
-      "scientific_name": "Clitocybe rivulosa",
-      "edibility": "Deadly poisonous. Contains high levels of muscarine. Can be fatal, particularly to children and elderly.",
-      "toxicity_level": "Deadly Poisonous",
-      "habitat": "Grows in grassy areas, lawns, parks, and path edges. Often found in fairy rings. Common in urban and suburban environments."
-    },
-    "physical_characteristics": "Small white to pale buff funnel-shaped mushroom. Cap 2-5cm across, initially convex then developing deep depression. Gills are pale and decurrent. Stem is slender and similarly colored. Often has concentric rings on cap surface.",
-    "look_alike": "Frequently confused with edible mushrooms like the Sweetbread Mushroom (Clitopilus prunulus) which has pink spores and mealy smell, or with edible funnel caps. The small size and growth in grass make it dangerous for novice foragers.",
-    "usages": "No safe uses. Extremely dangerous - contains muscarine levels higher than any other mushroom. Used in scientific research on muscarinic receptors.",
-    "safety_tips": "Avoid all small white mushrooms growing in grass. Never forage from lawns or parks where poisonous species are common. The common name 'Fool's Funnel' warns of the danger of mistaking it for edible species."
-  },
   "freckled_dapperling": {
     "basic_info": {
       "common_name": "Freckled Dapperling",
@@ -441,6 +415,19 @@
     "usages": "Culinary - excellent edible with mild flavor. Can be sliced and fried, baked, or used as pizza topping. Texture is similar to tofu. Large specimens can provide multiple meals.",
     "safety_tips": "Always cut open to check interior - must be pure white with no yellowing and no developing gill structure. Avoid any with internal discoloration or structures. Cook thoroughly before eating."
   },
+  "green_spored_parasol": {
+    "basic_info": {
+      "common_name": "Green-spored Parasol",
+      "scientific_name": "Chlorophyllum molybdites",
+      "edibility": "Poisonous. Causes severe gastrointestinal distress including vomiting, diarrhea, and abdominal cramps.",
+      "toxicity_level": "Poisonous",
+      "habitat": "Found in lawns, pastures, and open grassy areas. Often grows in fairy rings. Common in urban and suburban environments during warm, wet weather."
+    },
+    "physical_characteristics": "Large mushroom with white to pale tan cap covered with brown scales. Cap 10-30cm across, initially spherical then flattening. Gills white when young, becoming greenish as spores mature. Stem has prominent double ring and bulbous base without volva.",
+    "look_alike": "Often confused with edible parasol mushrooms. Distinguished by green spore print (edible parasols have white spores) and growth in grassy areas rather than woodlands. The green gills in mature specimens are a key identifier.",
+    "usages": "No safe uses. Common cause of mushroom poisoning due to similarity with edible parasol species. Sometimes used in mycology education to demonstrate identification features.",
+    "safety_tips": "Always check spore print - green indicates this poisonous species. Avoid all large white mushrooms with scales growing in lawns. The double ring and lack of volva help distinguish from deadly Amanitas."
+  },
   "hen_of_the_woods": {
     "basic_info": {
       "common_name": "Hen of the Woods",
@@ -479,19 +466,6 @@
     "look_alike": "Similar to other trumpet mushrooms but distinctive dark color makes confusion unlikely. The edible Chanterelle is yellow and has fold-like gills. Could be confused with old, blackened specimens of other species but the hollow trumpet shape is unique.",
     "usages": "Highly valued culinary mushroom with rich, smoky flavor. Excellent when dried - intensifies flavor. Used in sauces, soups, and as seasoning. Popular in French cuisine.",
     "safety_tips": "Clean thoroughly as debris and insects can hide inside the trumpet. Can be difficult to spot in leaf litter. When dried, can be stored for long periods. No poisonous look-alikes when properly identified."
-  },
-  "horse_mushroom": {
-    "basic_info": {
-      "common_name": "Horse Mushroom",
-      "scientific_name": "Agaricus arvensis",
-      "edibility": "Excellent edible mushroom with good flavor and texture. One of the best wild Agaricus species.",
-      "toxicity_level": "Choice Edible",
-      "habitat": "Grows in grasslands, pastures, parks, and woodland edges. Often found in rich soil, sometimes in fairy rings. Appears in summer and autumn."
-    },
-    "physical_characteristics": "Large mushroom with white cap 8-20cm across, often staining yellow when bruised. Cap smooth, becoming scaly with age. Gills pale pink becoming dark brown. Stem has large, hanging ring. Smells of aniseed or almonds.",
-    "look_alike": "Similar to other Agaricus species including the poisonous Yellow Stainer which stains bright yellow and has chemical smell. Also similar to deadly Amanitas but distinguished by brown gills and lack of volva.",
-    "usages": "Excellent culinary mushroom - can be used like cultivated mushrooms. Good raw in salads when young, or cooked in various dishes. Popular among foragers.",
-    "safety_tips": "Always check for yellow staining and smell - avoid any that stain bright yellow instantly or have chemical odor. Cut base to check for volva (indicates deadly Amanita). Only collect from clean, unpolluted areas."
   },
   "jack_o_lantern": {
     "basic_info": {
@@ -635,19 +609,6 @@
     "look_alike": "Similar to other Pleurotus species, all edible. Could be confused with the poisonous Jack O'Lantern which grows on wood but has true gills and different coloration. The lilac-gray spore print is distinctive.",
     "usages": "Excellent culinary mushroom with mild, subtle flavor. Versatile in cooking - can be saut\u00e9ed, grilled, used in soups and stir-fries. Commercially cultivated worldwide. Also used in mycoremediation.",
     "safety_tips": "Only collect from hardwoods (avoid yew and other toxic trees). Clean thoroughly as insects often inhabit gills. Cook before eating. One of the safest wild mushrooms for beginners to identify."
-  },
-  "paddy_straw_mushroom": {
-    "basic_info": {
-      "common_name": "Paddy Straw Mushroom",
-      "scientific_name": "Volvariella volvacea",
-      "edibility": "Choice edible and widely cultivated. Delicate flavor and texture. Must be cooked before eating.",
-      "toxicity_level": "Choice Edible",
-      "habitat": "Grows on decaying rice straw and other vegetable compost in tropical regions. Not native to temperate regions but cultivated worldwide."
-    },
-    "physical_characteristics": "Small to medium mushroom with gray to brown cap 5-12cm across. Cap is initially egg-shaped then expands. Gills are pink becoming brown. Distinctive volva (cup) at base but no ring. Often grows in clusters.",
-    "look_alike": "Dangerously similar to deadly Death Cap and Destroying Angel mushrooms when young. The pink gills and lack of ring help distinguish it, but extreme caution is needed. Volva is present in both edible and deadly species.",
-    "usages": "Widely cultivated and used in Asian cuisine, particularly in stir-fries, soups, and curries. Canned versions commonly available. Popular in Chinese and Thai cooking.",
-    "safety_tips": "Extreme caution needed - never forage wild specimens in temperate regions due to similarity with deadly Amanitas. Only consume commercially cultivated or expertly identified specimens. The volva makes it dangerously similar to death caps."
   },
   "pale_oyster": {
     "basic_info": {
@@ -909,32 +870,6 @@
     "usages": "Popular edible in Eastern European cuisine. Must remove slimy cap cuticle and pore layer before cooking. Good in soups and stews. Often dried.",
     "safety_tips": "Always peel the slimy cap skin before cooking. Remove pore layer if slimy. Cook thoroughly. Some people may experience digestive upset so try small portion first."
   },
-  "st_georges_mushroom": {
-    "basic_info": {
-      "common_name": "St. George's Mushroom",
-      "scientific_name": "Calocybe gambosa",
-      "edibility": "Choice edible with excellent flavor. One of the best spring mushrooms. Named for appearing around St. George's Day.",
-      "toxicity_level": "Choice Edible",
-      "habitat": "Grows in grasslands, woodland edges, and pastures. Often found in fairy rings. Appears in spring, from April to June."
-    },
-    "physical_characteristics": "Medium mushroom with creamy white to pale yellow cap. Cap 5-15cm, smooth and firm. Gills crowded and white. Stem stout and solid. Strong mealy or cucumber smell.",
-    "look_alike": "Similar to other white mushrooms including the poisonous Millky Mushroom (Clitocybe dealbata) which has decurrent gills and grows later in year. The spring appearance and mealy smell are key identifiers.",
-    "usages": "Excellent culinary mushroom with firm texture and good flavor. Can be used in various dishes. Popular in European spring foraging. Good dried or fresh.",
-    "safety_tips": "Only collect in spring when few other white mushrooms are around. The mealy smell is a good identifier. Cook thoroughly. Only collect from clean, unpolluted grasslands."
-  },
-  "stinking_dapperling": {
-    "basic_info": {
-      "common_name": "Stinking Dapperling",
-      "scientific_name": "Lepiota cristata",
-      "edibility": "Poisonous. Causes gastrointestinal distress. The unpleasant smell warns of its toxicity.",
-      "toxicity_level": "Poisonous",
-      "habitat": "Grows in grasslands, woodlands, and disturbed ground. Common in parks and gardens. Appears in summer and autumn."
-    },
-    "physical_characteristics": "Small mushroom with scaly cap and unpleasant rubbery or coal gas smell. Cap 2-5cm, white with brown scales in concentric rings. Gills white. Stem slender with slight ring zone. Smell intensifies with age.",
-    "look_alike": "Similar to other small Lepiota species, many of which are poisonous. The unpleasant smell is a key identifier. Could be confused with edible species by beginners.",
-    "usages": "No safe uses. The strong unpleasant smell makes it unpalatable anyway. Sometimes used in mushroom identification courses.",
-    "safety_tips": "Avoid all small, scaly-capped mushrooms with unpleasant smells. The combination of scales and bad odor is a warning of potential toxicity. Not worth foraging."
-  },
   "suede_bolete": {
     "basic_info": {
       "common_name": "Suede Bolete",
@@ -1026,19 +961,6 @@
     "usages": "Not recommended for consumption due to similarity with poisonous species and uncertain edibility. Best left alone.",
     "safety_tips": "Avoid all Amanitas with warty caps and volvas unless you are an expert. The similarities between edible and deadly species are too close for safe consumption by amateurs."
   },
-  "white_dapperling": {
-    "basic_info": {
-      "common_name": "White Dapperling",
-      "scientific_name": "Leucoagaricus leucothites",
-      "edibility": "Edible but caution advised. Similar to deadly Amanitas. Best left to experts.",
-      "toxicity_level": "Edible with extreme caution",
-      "habitat": "Grows in grasslands, parks, and gardens. Often found in fairy rings. Appears in summer and autumn."
-    },
-    "physical_characteristics": "Medium all-white mushroom. Cap 5-10cm, smooth and white. Gills white becoming pink. Stem white with ring. No volva at base. Entire mushroom is pure white.",
-    "look_alike": "Extremely similar to deadly Destroying Angel and other white Amanitas. Distinguished by lack of volva and pink-aging gills, but these differences can be subtle.",
-    "usages": "Can be eaten but not recommended due to dangerous similarity with deadly species. The risk outweighs the reward.",
-    "safety_tips": "Avoid all pure white gilled mushrooms unless you are absolutely certain of identification. The lack of volva must be confirmed by digging up the entire base."
-  },
   "woolly_milkcap": {
     "basic_info": {
       "common_name": "Woolly Milkcap",
@@ -1090,6 +1012,19 @@
     "look_alike": "Often confused with edible field mushrooms and horse mushrooms. The instant bright yellow staining and chemical smell are key identifiers. The staining is most obvious at stem base.",
     "usages": "No safe uses. The unpleasant smell and toxic properties make it unsuitable for any use. Sometimes used in identification courses to demonstrate staining reaction.",
     "safety_tips": "Always check for yellow staining by rubbing the base of the stem. Avoid any with chemical smell. The yellow staining is instant and bright, unlike the slow yellowing of edible species."
+  },
+    "yellow_veiled_amanita": {
+    "basic_info": {
+      "common_name": "Yellow-veiled Amanita",
+      "scientific_name": "Amanita velosa",
+      "edibility": "Edible when properly identified and cooked. Considered a good edible mushroom by experienced foragers.",
+      "toxicity_level": "Edible when cooked",
+      "habitat": "Found in woodland areas, particularly under oak trees. Mycorrhizal relationship with hardwoods. Appears in spring, often after rains."
+    },
+    "physical_characteristics": "Medium-sized Amanita with pale yellow to orange-yellow cap. Cap 5-15cm across, smooth with striate margin. Lacks the prominent warts of many Amanitas. Stem is white to pale yellow with fragile ring and sac-like volva at base. Flesh is white with mild odor.",
+    "look_alike": "Similar to other yellow-capped Amanitas, including some poisonous species. The lack of warts and striate cap margin help identification. Could be confused with deadly Amanita species by beginners.",
+    "usages": "Good culinary mushroom when properly identified. Must be cooked thoroughly. Popular among experienced forasers in California and western North America. Can be used in various cooked dishes.",
+    "safety_tips": "Only for experienced mushroom identifiers familiar with Amanita species. Always check for volva at base. Cook thoroughly before eating. When in doubt, avoid all Amanitas due to similarity with deadly species."
   },
   "yellowfoot": {
     "basic_info": {

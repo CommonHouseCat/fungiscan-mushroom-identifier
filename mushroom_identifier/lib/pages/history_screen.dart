@@ -146,9 +146,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
       await _databaseService.deleteMushroomInfo(id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mushroom entry deleted.'),
+          SnackBar(
+            content: const Text('Mushroom entry deleted.'),
             backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2, microseconds: 100),
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 80,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -160,6 +170,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           SnackBar(
             content: Text('Failed to delete entry: $e. Please refresh.'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2, microseconds: 100),
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 80,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -183,14 +203,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
       await Clipboard.setData(ClipboardData(text: buffer.toString()));
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mushroom information copied to clipboard.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
     } catch (e) {
       debugPrint('Error copying mushroom info: $e');
       if (mounted) {
@@ -198,6 +210,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
           SnackBar(
             content: Text('Failed to copy: $e'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2, microseconds: 100),
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 80,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
