@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'home_screen.dart';
+import 'search_screen.dart';
 import 'history_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -67,16 +68,18 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onPageChanged: (index) => setState(() => _selectedIndex = index),
         children: const [
           HomeScreen(),
+          SearchScreen(),
           HistoryScreen(),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 65),
+        padding: const EdgeInsets.symmetric(horizontal: 40),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildNavItem(Icons.home, 0, colorScheme),
-            _buildNavItem(Icons.history, 1, colorScheme),
+            _buildNavItem(Icons.search, 1, colorScheme),
+            _buildNavItem(Icons.history, 2, colorScheme),
           ],
         ),
       ),
