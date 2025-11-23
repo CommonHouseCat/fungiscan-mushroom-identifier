@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,34 +17,30 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   bool loading = true;
 
   Map<String, dynamic> mushroomDB = {};
-  List<String> speciesList = ["All Species", "Only Mushrooms"];
-  String selectedSpecies = "All Species";
+  final List<String> speciesList = ["All Species", "Only Mushrooms"];
+  String selectedSpecies = "Only Mushrooms";
 
   List<Marker> mushroomMarkers = [];
   List<dynamic> mushroomRawData = [];
 
   String selectedRadius = "10";
   String selectedLimit = "10";
-  String selectedMonth = "All";
+  late String selectedMonth;
 
   @override
   void initState() {
     super.initState();
-    loadMushroomJson().then((_) => initLocation());
+    const monthAbbreviations = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    selectedMonth = monthAbbreviations[DateTime.now().month - 1];
+    initLocation();
   }
 
-  Future<void> loadMushroomJson() async {
-    final raw = await rootBundle.loadString("assets/mushroom_info.json");
-    mushroomDB = jsonDecode(raw);
-
-    for (var entry in mushroomDB.entries) {
-      final sci = entry.value["basic_info"]["scientific_name"];
-      if (sci != null) speciesList.add(sci);
-    }
-
-    setState(() {});
-  }
-
+  // -------------------------------------------------------------
+  // LOCATION
+  // -------------------------------------------------------------
   Future<void> initLocation() async {
     final permission = await _handlePermission();
     if (!permission) {
@@ -70,6 +65,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         permission == LocationPermission.always;
   }
 
+  // -------------------------------------------------------------
+  // iNATURALIST API CALL
+  // -------------------------------------------------------------
   Future<void> fetchMushrooms() async {
     if (userLocation == null) return;
 
@@ -77,9 +75,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     String taxonFilter = "";
     if (selectedSpecies == "Only Mushrooms") {
       taxonFilter = "taxon_id=47170&"; // Fungi
-    } else if (selectedSpecies != "All Species") {
-      taxonFilter =
-      "taxon_name=${Uri.encodeComponent(selectedSpecies)}&"; // specific
     }
 
     // Month filter
@@ -88,16 +83,24 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
     final url =
         "https://api.inaturalist.org/v1/observations?"
-        "${taxonFilter}"
-        "${monthFilter}"
+        "$taxonFilter"
+        "$monthFilter"
         "lat=${userLocation!.latitude}&"
         "lng=${userLocation!.longitude}&"
         "radius=$selectedRadius&"
         "per_page=$selectedLimit";
 
-    print("API URL = $url");
-
     final res = await http.get(Uri.parse(url));
+
+    if (!mounted) return;
+
+    if (res.statusCode != 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to load observations")),
+      );
+      return;
+    }
+
     final json = jsonDecode(res.body);
 
     final List results = json["results"];
@@ -128,7 +131,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
       );
     }
 
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   int _monthNumber(String m) {
@@ -140,6 +145,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     return months[m] ?? 1;
   }
 
+  // -------------------------------------------------------------
+  // SHOW MARKER DETAILS
+  // -------------------------------------------------------------
   void showSpeciesDetail(dynamic item) {
     final species = item["taxon"]?["name"] ?? "Unknown";
     final common = item["taxon"]?["preferred_common_name"] ?? "Unknown";
@@ -179,6 +187,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
+  // -------------------------------------------------------------
+  // UI
+  // -------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -196,6 +207,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Forage Map"),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_alt),
@@ -229,30 +241,27 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
+  // -------------------------------------------------------------
+  // FILTER SHEET
+  // -------------------------------------------------------------
   void showFilterSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       builder: (_) => StatefulBuilder(
         builder: (context, setSheetState) {
           return Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              left: 50,
+              right: 50,
+              top: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20, // Safe for keyboard
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text("Filter options", style: TextStyle(fontSize: 18)),
+                const Text("Filter options", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(height: 16),
-
-                // species
-                DropdownButton<String>(
-                  value: selectedSpecies,
-                  items: speciesList.map((e) {
-                    return DropdownMenuItem(value: e, child: Text(e));
-                  }).toList(),
-                  onChanged: (v) {
-                    setSheetState(() => selectedSpecies = v!);
-                    setState(() => selectedSpecies = v!);
-                  },
-                ),
 
                 // month
                 DropdownButton<String>(
@@ -297,8 +306,24 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                   },
                 ),
 
-                const SizedBox(height: 12),
+                // species
+                DropdownButton<String>(
+                  value: selectedSpecies,
+                  items: speciesList.map((e) {
+                    return DropdownMenuItem(value: e, child: Text(e));
+                  }).toList(),
+                  onChanged: (v) {
+                    setSheetState(() => selectedSpecies = v!);
+                    setState(() => selectedSpecies = v!);
+                  },
+                ),
+
+                const SizedBox(height: 16),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.9),
+                    elevation: 5
+                  ),
                   onPressed: () async {
                     Navigator.pop(context);
                     await fetchMushrooms();

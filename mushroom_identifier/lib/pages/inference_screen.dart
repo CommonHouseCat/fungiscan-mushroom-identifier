@@ -85,6 +85,7 @@ class _InferenceScreenState extends State<InferenceScreen> {
         lookAlike: mushroomInfo['look_alike'] ?? 'N/A',
         usages: mushroomInfo['usages'] ?? 'N/A',
         safetyTips: mushroomInfo['safety_tips'] ?? 'N/A',
+        wikipediaUrl: mushroomInfo['search_metadata']['wikipedia_url'] ?? 'N/A',
       );
 
       await _cleanup();
@@ -102,6 +103,7 @@ class _InferenceScreenState extends State<InferenceScreen> {
               DatabaseService.columnLookAlike: mushroomInfo['look_alike'] ?? 'N/A',
               DatabaseService.columnUsages: mushroomInfo['usages'] ?? 'N/A',
               DatabaseService.columnSafetyTips: mushroomInfo['safety_tips'] ?? 'N/A',
+              DatabaseService.columnWikipedia: mushroomInfo['search_metadata']['wikipedia_url'] ?? 'N/A',
             },
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/mushroom_info_item.dart';
 import '../services/database_service.dart';
@@ -226,6 +227,84 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
+  Future<void> _saveSortPreference(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('history_sort_type', value);
+  }
+
+  void _showSortSheet() {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 16),
+            Text("Sort History", style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+            const SizedBox(height: 20),
+
+            RadioListTile<String>(
+              title: Text("Date (Newest First)", style: TextStyle(color: colorScheme.onSurface),),
+              subtitle: Text("Most recent scans appear first", style: TextStyle(color: colorScheme.onSurface),),
+              value: 'Date',
+              groupValue: _sortType,
+              onChanged: (val) => _applySort(val!),
+
+            ),
+            RadioListTile<String>(
+              title: Text("Name (A → Z)", style: TextStyle(color: colorScheme.onSurface)),
+              subtitle: Text("Alphabetical by common or scientific name", style: TextStyle(color: colorScheme.onSurface)),
+              value: 'Name',
+              groupValue: _sortType,
+              onChanged: (val) => _applySort(val!),
+            ),
+
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.9),
+                    elevation: 5
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: Text("Close", style: TextStyle(color: colorScheme.onSurface)),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _applySort(String value) async {
+    await _saveSortPreference(value);
+    if (mounted) {
+      setState(() => _sortType = value);
+      _sortHistory();
+      Navigator.pop(context);
+    }
+  }
+
   Widget _buildBody() {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -267,37 +346,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0,16.0, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(
-                'Sort by:',
-                style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
-              ),
-              const SizedBox(width: 8.0),
-              DropdownButton<String>(
-                  value: _sortType,
-                  items: [
-                    DropdownMenuItem(value: 'Date', child: Text('Date', style: TextStyle(color: colorScheme.onSurface))),
-                    DropdownMenuItem(value: 'Name', child: Text('Name', style: TextStyle(color: colorScheme.onSurface))),
-                  ],
-                  onChanged: (value) async {
-                    if (value == null) return;
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString('sortType', value);
-
-                    setState(() {
-                      _sortType = value;
-                      _sortHistory();
-                    });
-                  }
-              ),
-            ],
-          ),
-        ),
-
+        Padding(padding: const EdgeInsets.only(top: 16.0),),
         Expanded(
           child: GridView.builder(
             padding: const EdgeInsets.all(8.0),
@@ -343,6 +392,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ),
         centerTitle: true,
         actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.sort),
+            color: colorScheme.onSurface,
+            tooltip: "Sort History",
+            onPressed: _showSortSheet,
+          ),
           IconButton(
             icon: Icon(Icons.refresh, color: colorScheme.onSurface),
             onPressed: _isLoading ? null : _fetchMushroomInfoHistory,

@@ -28,6 +28,7 @@ class DatabaseService {
   static const String columnSafetyTips = 'safety_tips';
   static const String columnDateOfCreation = 'date_of_creation';
   static const String columnIsBookMark = 'is_bookmark';
+  static const String columnWikipedia = "wikipedia_url";
 
   Future<Database> _initDatabase() async {
     final directory = await getApplicationDocumentsDirectory();
@@ -48,6 +49,7 @@ class DatabaseService {
             $columnUsages TEXT,
             $columnSafetyTips TEXT,
             $columnDateOfCreation TEXT,
+            $columnWikipedia TEXT,
             $columnIsBookMark INTEGER DEFAULT 0            
           )
         ''');
@@ -85,6 +87,7 @@ class DatabaseService {
     required String lookAlike,
     required String usages,
     required String safetyTips,
+    required String wikipediaUrl,
   }) async {
     final db = await database;
     await db.insert(tableMushrooms, {
@@ -96,6 +99,7 @@ class DatabaseService {
       columnUsages: usages,
       columnSafetyTips: safetyTips,
       columnDateOfCreation: DateTime.now().toIso8601String(),
+      columnWikipedia: wikipediaUrl,
       columnIsBookMark: 0,
     });
   }

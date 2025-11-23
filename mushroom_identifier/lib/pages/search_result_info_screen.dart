@@ -12,31 +12,68 @@ class SearchResultInfoScreen extends StatelessWidget {
   });
 
   void _openWiki(BuildContext context) async {
-    final url = mushroomData["search_metadata"]?["wikipedia_url"];
-    if (url == null) return;
+    final url = mushroomData["search_metadata"]?["wikipedia_url"] as String?;
+    if (url == null || url.isEmpty) return;
 
     final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Could not open Wikipedia link")),
+        );
+      }
+    }
   }
 
-  Widget _buildSectionTitle(BuildContext context, String title) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Text(
-      title,
-      style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface),
+  // Reusable info box — same as in MushroomInformationScreen
+  Widget _buildInfoBox({
+    required BuildContext context,
+    required List<Widget> children,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.tertiary,
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
+      ),
     );
   }
 
-  Widget _buildBox(BuildContext context, Widget child) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.tertiary,
-        borderRadius: BorderRadius.circular(8),
+  // Consistent bullet point style — larger font, bold titles
+  Widget _buildBulletPoint(String title, String content, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textColor = colorScheme.onSurface;
+
+    if (content.isEmpty || content == "N/A") content = "Not specified";
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("• ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 16, height: 1.4, color: textColor,),
+                children: [
+                  if (title.isNotEmpty)
+                    TextSpan(
+                      text: "$title: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  TextSpan(text: content),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-      child: child,
     );
   }
 
@@ -46,13 +83,14 @@ class SearchResultInfoScreen extends StatelessWidget {
     final basic = mushroomData["basic_info"] ?? {};
 
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme.tertiary,
         title: Text(
-          basic["common_name"] ?? "Mushroom Info",
+          basic["common_name"] ?? "Mushroom Details",
           style: TextStyle(color: colorScheme.onSurface),
         ),
         centerTitle: true,
@@ -64,88 +102,100 @@ class SearchResultInfoScreen extends StatelessWidget {
           ),
         ],
       ),
-
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // MAIN IMAGE
+            // Main Image
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               child: meta["image"] != null
                   ? Image.network(
-                meta["image"],
+                meta["image"] as String,
                 width: double.infinity,
-                height: 240,
+                height: 260,
                 fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Image.asset(
+                  "assets/sample/error.jpg",
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: 260,
+                ),
               )
                   : Image.asset(
                 "assets/sample/error.jpg",
-                width: double.infinity,
-                height: 240,
                 fit: BoxFit.cover,
+                width: double.infinity,
+                height: 260,
               ),
             ),
 
             const SizedBox(height: 20),
 
-            /// BASIC INFO
-            _buildSectionTitle(context, "Basic Information"),
-            const SizedBox(height: 8),
-            _buildBox(
-              context,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Common Name: ${basic["common_name"] ?? "N/A"}"),
-                  Text("Scientific Name: ${basic["scientific_name"] ?? "N/A"}"),
-                  Text("Edibility: ${basic["edibility"] ?? "N/A"}"),
-                  Text("Toxicity Level: ${basic["toxicity_level"] ?? "N/A"}"),
-                  Text("Habitat: ${basic["habitat"] ?? "N/A"}"),
-                ],
-              ),
+            // Basic Information
+            Text("Basic Information", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildInfoBox(
+              context: context,
+              children: [
+                _buildBulletPoint("Common Name", basic["common_name"] ?? "N/A", context),
+                _buildBulletPoint("Scientific Name", basic["scientific_name"] ?? "N/A", context),
+                _buildBulletPoint("Edibility", basic["edibility"] ?? "N/A", context),
+                _buildBulletPoint("Toxicity Level", basic["toxicity_level"] ?? "N/A", context),
+                _buildBulletPoint("Habitat", basic["habitat"] ?? "N/A", context),
+              ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            /// PHYSICAL CHARACTERISTICS
-            _buildSectionTitle(context, "Physical Characteristics"),
-            const SizedBox(height: 8),
-            _buildBox(
-              context,
-              Text(mushroomData["physical_characteristics"] ?? "N/A"),
+            // Physical Characteristics
+            Text("Physical Characteristics", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildInfoBox(
+              context: context,
+              children: [
+                _buildBulletPoint("", mushroomData["physical_characteristics"]?.toString() ?? "N/A", context),
+              ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            /// LOOK ALIKE
-            _buildSectionTitle(context, "Look-Alike"),
-            const SizedBox(height: 8),
-            _buildBox(
-              context,
-              Text(mushroomData["look_alike"] ?? "N/A"),
+            // Look-Alike
+            Text("Look-Alike Species", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildInfoBox(
+              context: context,
+              children: [
+                _buildBulletPoint("", mushroomData["look_alike"]?.toString() ?? "N/A", context),
+              ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            /// USAGES
-            _buildSectionTitle(context, "Usages"),
-            const SizedBox(height: 8),
-            _buildBox(
-              context,
-              Text(mushroomData["usages"] ?? "N/A"),
+            // Usages
+            Text("Culinary & Medicinal Uses", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildInfoBox(
+              context: context,
+              children: [
+                _buildBulletPoint("", mushroomData["usages"]?.toString() ?? "N/A", context),
+              ],
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            /// Safety Tips
-            _buildSectionTitle(context, "Safety Tips"),
-            const SizedBox(height: 8),
-            _buildBox(
-              context,
-              Text(mushroomData["safety_tips"] ?? "N/A"),
+            // Safety Tips
+            Text("Safety Tips", style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            _buildInfoBox(
+              context: context,
+              children: [
+                _buildBulletPoint("", mushroomData["safety_tips"]?.toString() ?? "N/A", context),
+              ],
             ),
+
+            const SizedBox(height: 30),
           ],
         ),
       ),

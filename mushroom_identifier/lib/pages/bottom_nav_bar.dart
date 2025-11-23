@@ -75,7 +75,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 40),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

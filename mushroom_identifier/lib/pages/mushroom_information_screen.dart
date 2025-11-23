@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/database_service.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -33,7 +34,10 @@ class MushroomInformationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBulletPoint(String title, String content) {
+  Widget _buildBulletPoint(String title, String content, BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textColor = colorScheme.onSurface;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -41,14 +45,56 @@ class MushroomInformationScreen extends StatelessWidget {
         children: [
           const Text('• ', style: TextStyle(fontSize: 16)),
           Expanded(
-            child: Text(
-              title.isNotEmpty ? '$title: $content' : content,
-              style: const TextStyle(fontSize: 16),
+            child: RichText(
+              text: TextSpan(
+                style: TextStyle(fontSize: 16, height: 1.4, color: textColor,),
+                children: [
+                  if (title.isNotEmpty)
+                    TextSpan(
+                      text: "$title: ",
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  TextSpan(text: content),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _openWiki(BuildContext context) async {
+    final String? url = mushroomData[DatabaseService.columnWikipedia] as String?;
+
+    if (url == null || url.isEmpty) {
+      final searchMetaJson = mushroomData["search_metadata"] as String?;
+      if (searchMetaJson != null) {
+        try {
+          final meta = jsonDecode(searchMetaJson);
+          final fallbackUrl = meta["wikipedia_url"] as String?;
+          if (fallbackUrl != null && await launchUrl(Uri.parse(fallbackUrl), mode: LaunchMode.externalApplication)) {
+            return;
+          }
+        } catch (_) {}
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No Wikipedia link available")),
+        );
+      }
+      return;
+    }
+
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Could not open Wikipedia link")),
+        );
+      }
+    }
   }
 
   @override
@@ -73,6 +119,14 @@ class MushroomInformationScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.open_in_new, color: colorScheme.onSurface),
+            onPressed: () => _openWiki(context),
+            tooltip: "Open Wikipedia",
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -106,29 +160,29 @@ class MushroomInformationScreen extends StatelessWidget {
             _buildInfoBox(
               context: context,
               children: [
-                _buildBulletPoint('Mushroom Name', _parseJsonField(basicInfoJson, 'common_name')),
-                _buildBulletPoint('Scientific Name', _parseJsonField(basicInfoJson, 'scientific_name')),
-                _buildBulletPoint('Edibility', _parseJsonField(basicInfoJson, 'edibility')),
-                _buildBulletPoint('Toxicity Level', _parseJsonField(basicInfoJson, 'toxicity_level')),
-                _buildBulletPoint('Habitat', _parseJsonField(basicInfoJson, 'habitat')),
+                _buildBulletPoint('Mushroom Name', _parseJsonField(basicInfoJson, 'common_name'), context),
+                _buildBulletPoint('Scientific Name', _parseJsonField(basicInfoJson, 'scientific_name'), context),
+                _buildBulletPoint('Edibility', _parseJsonField(basicInfoJson, 'edibility'), context),
+                _buildBulletPoint('Toxicity Level', _parseJsonField(basicInfoJson, 'toxicity_level'), context),
+                _buildBulletPoint('Habitat', _parseJsonField(basicInfoJson, 'habitat'), context),
               ],
             ),
             const SizedBox(height: 16),
             Text('Physical Characteristics', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(context: context, children: [_buildBulletPoint('', physicalCharacteristics)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', physicalCharacteristics, context)]),
             const SizedBox(height: 16),
             Text('Look Alike', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(context: context, children: [_buildBulletPoint('', lookAlike)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', lookAlike, context)]),
             const SizedBox(height: 16),
             Text('Usages', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(context: context, children: [_buildBulletPoint('', usages)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', usages, context)]),
             const SizedBox(height: 16),
             Text('Safety Tips', style: textTheme.headlineSmall?.copyWith(color: colorScheme.onSurface)),
             const SizedBox(height: 8),
-            _buildInfoBox(context: context, children: [_buildBulletPoint('', safetyTips)]),
+            _buildInfoBox(context: context, children: [_buildBulletPoint('', safetyTips, context)]),
           ],
         ),
       ),
