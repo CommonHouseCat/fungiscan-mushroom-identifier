@@ -29,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
       setState(() {
         _allMushrooms = data;
-        _filteredResults = data.entries.toList();
+        _filteredResults = data.entries.take(10).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -45,7 +45,7 @@ class _SearchScreenState extends State<SearchScreen> {
       _query = query.trim().toLowerCase();
 
       if (_query.isEmpty) {
-        _filteredResults = _allMushrooms.entries.toList();
+        _filteredResults = _allMushrooms.entries.take(10).toList();
         return;
       }
 

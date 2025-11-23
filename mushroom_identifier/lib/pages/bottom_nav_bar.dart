@@ -1,3 +1,4 @@
+import 'package:FungiScan/pages/forage_map_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'home_screen.dart';
@@ -68,8 +69,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
         onPageChanged: (index) => setState(() => _selectedIndex = index),
         children: const [
           HomeScreen(),
-          SearchScreen(),
           HistoryScreen(),
+          SearchScreen(),
+          ForageMapScreen(),
         ],
       ),
       child: Padding(
@@ -78,8 +80,9 @@ class _BottomNavBarState extends State<BottomNavBar> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _buildNavItem(Icons.home, 0, colorScheme),
-            _buildNavItem(Icons.search, 1, colorScheme),
-            _buildNavItem(Icons.history, 2, colorScheme),
+            _buildNavItem(Icons.history, 1, colorScheme),
+            _buildNavItem(Icons.search, 2, colorScheme),
+            _buildNavItem(Icons.map, 3, colorScheme),
           ],
         ),
       ),
