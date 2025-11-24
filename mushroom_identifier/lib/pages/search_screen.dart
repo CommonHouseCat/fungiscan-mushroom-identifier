@@ -26,7 +26,7 @@ class _SearchScreenState extends State<SearchScreen> {
     try {
       final rawJson = await rootBundle.loadString("assets/mushroom_info.json");
       final data = jsonDecode(rawJson) as Map<String, dynamic>;
-
+      if (!mounted) return;
       setState(() {
         _allMushrooms = data;
         _filteredResults = data.entries.take(10).toList();
@@ -34,6 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     } catch (e) {
       debugPrint("Error loading mushroom database: $e");
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

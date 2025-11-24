@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/mushroom_info_item.dart';
 import '../services/database_service.dart';
@@ -20,13 +19,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _errorMessage = '';
   String _sortType = 'Date';
 
-
   @override
   void initState() {
     super.initState();
     _databaseService = DatabaseService();
-    _loadSortPreference();
-    _fetchMushroomInfoHistory();
+    _loadSortPreference().then((_) {
+      _fetchMushroomInfoHistory();
+    });
+  }
+
+  Future<void> _loadSortPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('history_sort_type') ?? 'Date';
+    if (mounted) setState(() => _sortType = saved);
+  }
+
+  Future<void> _saveSortPreference(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('history_sort_type', value);
   }
 
   void _sortHistory() {
@@ -50,7 +60,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-
   String _extractName(String? basicInfo) {
     if (basicInfo == null) return '';
     try {
@@ -58,53 +67,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       return map['common_name'] ?? '';
     } catch (_) {
       return '';
-    }
-  }
-
-  Future<void> _loadSortPreference() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedSort = prefs.getString('sortType');
-    if (savedSort != null && mounted) {
-      setState(() {
-        _sortType = savedSort;
-      });
-    }
-  }
-
-  Future<void> _toggleBookmark(int id, int index) async {
-    try {
-      // Find actual item by ID to prevent wrong toggling after sorting
-      final int itemIndex = _mushroomInfoHistory.indexWhere(
-              (item) => item[DatabaseService.columnId] == id);
-      if (itemIndex == -1) return; // safety check
-
-      final currentState =
-          _mushroomInfoHistory[itemIndex][DatabaseService.columnIsBookMark] == 1;
-
-      // Update database first
-      await _databaseService.toggleBookmark(id, currentState);
-
-      // Update in-memory list safely
-      setState(() {
-        _mushroomInfoHistory[itemIndex] = {
-          ..._mushroomInfoHistory[itemIndex],
-          DatabaseService.columnIsBookMark: currentState ? 0 : 1,
-        };
-
-        // Ensure bookmarked items always appear first
-        _mushroomInfoHistory.sort((a, b) {
-          final int aBookmark = a[DatabaseService.columnIsBookMark] ?? 0;
-          final int bBookmark = b[DatabaseService.columnIsBookMark] ?? 0;
-          if (aBookmark != bBookmark) return bBookmark - aBookmark;
-          final aDate =
-          DateTime.parse(a[DatabaseService.columnDateOfCreation]);
-          final bDate =
-          DateTime.parse(b[DatabaseService.columnDateOfCreation]);
-          return bDate.compareTo(aDate);
-        });
-      });
-    } catch (e) {
-      debugPrint("Error toggling bookmark: $e");
     }
   }
 
@@ -120,9 +82,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       if (mounted) {
         setState(() {
           _mushroomInfoHistory = List<Map<String, dynamic>>.from(data);
-          _sortHistory();
           _isLoading = false;
         });
+        _sortHistory();
       }
     } catch (e) {
       debugPrint('Error fetching mushroom info history: $e');
@@ -132,6 +94,36 @@ class _HistoryScreenState extends State<HistoryScreen> {
           _isLoading = false;
         });
       }
+    }
+  }
+
+  Future<void> _toggleBookmark(int id, int index) async {
+    try {
+      final int itemIndex = _mushroomInfoHistory.indexWhere(
+        (item) => item[DatabaseService.columnId] == id,
+      );
+      if (itemIndex == -1) return;
+
+      final currentState =
+          _mushroomInfoHistory[itemIndex][DatabaseService.columnIsBookMark] ==
+          1;
+      await _databaseService.toggleBookmark(id, currentState);
+      setState(() {
+        _mushroomInfoHistory[itemIndex] = {
+          ..._mushroomInfoHistory[itemIndex],
+          DatabaseService.columnIsBookMark: currentState ? 0 : 1,
+        };
+        _mushroomInfoHistory.sort((a, b) {
+          final int aBookmark = a[DatabaseService.columnIsBookMark] ?? 0;
+          final int bBookmark = b[DatabaseService.columnIsBookMark] ?? 0;
+          if (aBookmark != bBookmark) return bBookmark - aBookmark;
+          final aDate = DateTime.parse(a[DatabaseService.columnDateOfCreation]);
+          final bDate = DateTime.parse(b[DatabaseService.columnDateOfCreation]);
+          return bDate.compareTo(aDate);
+        });
+      });
+    } catch (e) {
+      debugPrint("Error toggling bookmark: $e");
     }
   }
 
@@ -152,11 +144,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2, microseconds: 100),
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 80,
-            ),
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 80),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -173,11 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2, microseconds: 100),
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 80,
-            ),
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 80),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -190,7 +174,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Future<void> _copyMushroom(Map<String, dynamic> mushroom) async {
     try {
       final buffer = StringBuffer()
-        ..writeln('🧠 Confidence Score: ${((mushroom[DatabaseService.columnConfidenceScore] as double) * 100).toStringAsFixed(2)}%')
+        ..writeln(
+          '🧠 Confidence Score: ${((mushroom[DatabaseService.columnConfidenceScore] as double) * 100).toStringAsFixed(2)}%',
+        )
         ..writeln('\n📘 Basic Information:')
         ..writeln(mushroom[DatabaseService.columnBasicInfo])
         ..writeln('\n🧩 Physical Characteristics:')
@@ -203,7 +189,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ..writeln(mushroom[DatabaseService.columnSafetyTips]);
 
       await Clipboard.setData(ClipboardData(text: buffer.toString()));
-
     } catch (e) {
       debugPrint('Error copying mushroom info: $e');
       if (mounted) {
@@ -213,11 +198,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2, microseconds: 100),
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 80,
-            ),
+            margin: const EdgeInsets.only(left: 16, right: 16, bottom: 80),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -227,14 +208,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _saveSortPreference(String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('history_sort_type', value);
-  }
-
   void _showSortSheet() {
     final colorScheme = Theme.of(context).colorScheme;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -254,39 +229,79 @@ class _HistoryScreenState extends State<HistoryScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Drag handle
             Center(
-              child: Container(width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey[400], borderRadius: BorderRadius.circular(10))),
+              child: Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
-            Text("Sort History", style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: colorScheme.onSurface)),
+
+            // Title
+            Text(
+              "Sort History",
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 20),
 
-            RadioListTile<String>(
-              title: Text("Date (Newest First)", style: TextStyle(color: colorScheme.onSurface),),
-              subtitle: Text("Most recent scans appear first", style: TextStyle(color: colorScheme.onSurface),),
-              value: 'Date',
+            RadioGroup<String>(
               groupValue: _sortType,
-              onChanged: (val) => _applySort(val!),
+              onChanged: (val) => _applySort(val!) ,
+              child: Column(
+                children: <Widget>[
+                  RadioListTile<String>(
+                    value: 'Date',
+                    title: Text(
+                      "Date (Newest First)",
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                    subtitle: Text(
+                      "Most recent scans appear first",
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  ),
 
-            ),
-            RadioListTile<String>(
-              title: Text("Name (A → Z)", style: TextStyle(color: colorScheme.onSurface)),
-              subtitle: Text("Alphabetical by common or scientific name", style: TextStyle(color: colorScheme.onSurface)),
-              value: 'Name',
-              groupValue: _sortType,
-              onChanged: (val) => _applySort(val!),
+                  RadioListTile<String>(
+                    value: 'Name',
+                    title: Text(
+                      "Name (A → Z)",
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                    subtitle: Text(
+                      "Alphabetical by common or scientific name",
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             const SizedBox(height: 20),
+
+            // Close button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.9),
-                    elevation: 5
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.tertiary.withValues(alpha: 0.9),
+                  elevation: 5,
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: Text("Close", style: TextStyle(color: colorScheme.onSurface)),
+                child: Text(
+                  "Close",
+                  style: TextStyle(color: colorScheme.onSurface),
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -306,10 +321,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildBody() {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
     if (_errorMessage.isNotEmpty) {
       return Center(
@@ -318,16 +332,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
           children: [
             Text(
               _errorMessage,
-              style: textTheme.bodyMedium?.copyWith(color: Colors.red),
+              style: const TextStyle(color: Colors.red),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _fetchMushroomInfoHistory,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-              ),
-              child: Text('Retry',style: TextStyle(color: colorScheme.onPrimary)),
+              child: const Text('Retry'),
             ),
           ],
         ),
@@ -335,46 +346,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
 
     if (_mushroomInfoHistory.isEmpty) {
-      return Center(
+      return const Center(
         child: Text(
           'No mushroom entries found.',
-          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
           textAlign: TextAlign.center,
         ),
       );
     }
 
-    return Column(
-      children: [
-        Padding(padding: const EdgeInsets.only(top: 16.0),),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(8.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8.0,
-              mainAxisSpacing: 8.0,
-              childAspectRatio: 1.05,
-            ),
-            itemCount: _mushroomInfoHistory.length,
-            itemBuilder: (context, index) {
-              final item = _mushroomInfoHistory[index];
-              final int? itemId = item[DatabaseService.columnId] as int?;
-              if (itemId == null) {
-                return const ListTile(title: Text('Error: Invalid ID'));
-              }
-
-              return MushroomInfoItem(
-                key: ValueKey(itemId),
-                item: item,
-                onDelete: () => _deleteMushroom(itemId, index),
-                onCopy: () => _copyMushroom(item),
-                onToggleBookmark: () => _toggleBookmark(itemId, index),
-              );
-            },
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.05,
         ),
-      ],
+        itemCount: _mushroomInfoHistory.length,
+        itemBuilder: (context, index) {
+          final item = _mushroomInfoHistory[index];
+          final int? itemId = item[DatabaseService.columnId] as int?;
+          if (itemId == null) return const SizedBox.shrink();
+
+          return MushroomInfoItem(
+            key: ValueKey(itemId),
+            item: item,
+            onDelete: () => _deleteMushroom(itemId, index),
+            onCopy: () => _copyMushroom(item),
+            onToggleBookmark: () => _toggleBookmark(itemId, index),
+          );
+        },
+      ),
     );
   }
 
@@ -386,10 +390,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme.tertiary,
-        title: Text(
-          "History",
-          style: TextStyle(color: colorScheme.onSurface),
-        ),
+        title: Text("History", style: TextStyle(color: colorScheme.onSurface)),
         centerTitle: true,
         actions: <Widget>[
           IconButton(

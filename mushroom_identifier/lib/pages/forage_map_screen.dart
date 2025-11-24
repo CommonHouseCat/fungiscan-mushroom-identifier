@@ -4,6 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ForageMapScreen extends StatefulWidget {
   const ForageMapScreen({super.key});
@@ -16,16 +17,13 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   LatLng? userLocation;
   bool loading = true;
 
-  Map<String, dynamic> mushroomDB = {};
   final List<String> speciesList = ["All Species", "Only Mushrooms"];
-  String selectedSpecies = "Only Mushrooms";
-
   List<Marker> mushroomMarkers = [];
-  List<dynamic> mushroomRawData = [];
 
-  String selectedRadius = "10";
-  String selectedLimit = "10";
   late String selectedMonth;
+  String selectedRadius = "5";
+  String selectedLimit = "20";
+  String selectedSpecies = "Only Mushrooms";
 
   @override
   void initState() {
@@ -35,12 +33,30 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
     selectedMonth = monthAbbreviations[DateTime.now().month - 1];
-    initLocation();
+    _loadFilterPreferences().then((_) {
+      initLocation();
+    });
   }
 
-  // -------------------------------------------------------------
-  // LOCATION
-  // -------------------------------------------------------------
+  Future<void> _loadFilterPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        selectedRadius = prefs.getString('forage_radius') ?? "5";
+        selectedLimit = prefs.getString('forage_limit') ?? "20";
+        selectedSpecies = prefs.getString('forage_species') ?? "Only Mushrooms";
+      });
+    }
+  }
+
+  // Save preferences whenever user applies filters
+  Future<void> _saveFilterPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('forage_radius', selectedRadius);
+    await prefs.setString('forage_limit', selectedLimit);
+    await prefs.setString('forage_species', selectedSpecies);
+  }
+
   Future<void> initLocation() async {
     final permission = await _handlePermission();
     if (!permission) {
@@ -65,9 +81,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         permission == LocationPermission.always;
   }
 
-  // -------------------------------------------------------------
-  // iNATURALIST API CALL
-  // -------------------------------------------------------------
   Future<void> fetchMushrooms() async {
     if (userLocation == null) return;
 
@@ -78,8 +91,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     }
 
     // Month filter
-    String monthFilter =
-    selectedMonth == "All" ? "" : "month=${_monthNumber(selectedMonth)}&";
+    String monthFilter = selectedMonth == "All"
+        ? ""
+        : "month=${_monthNumber(selectedMonth)}&";
 
     final url =
         "https://api.inaturalist.org/v1/observations?"
@@ -106,7 +120,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     final List results = json["results"];
 
     mushroomMarkers.clear();
-    mushroomRawData = results;
 
     for (int i = 0; i < results.length; i++) {
       final r = results[i];
@@ -138,17 +151,13 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
   int _monthNumber(String m) {
     const months = {
-      "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4,
-      "May": 5, "Jun": 6, "Jul": 7, "Aug": 8,
-      "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12
+      "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7,
+      "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
     };
     return months[m] ?? 1;
   }
 
-  // -------------------------------------------------------------
-  // SHOW MARKER DETAILS
-  // -------------------------------------------------------------
-  void showSpeciesDetail(dynamic item) {
+    void showSpeciesDetail(dynamic item) {
     final species = item["taxon"]?["name"] ?? "Unknown";
     final common = item["taxon"]?["preferred_common_name"] ?? "Unknown";
     final imageUrl = item["photos"] != null && item["photos"].isNotEmpty
@@ -162,8 +171,14 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(common, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text(species, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+            Text(
+              common,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              species,
+              style: const TextStyle(fontSize: 14, color: Colors.grey),
+            ),
             const SizedBox(height: 10),
 
             if (imageUrl != null)
@@ -180,22 +195,178 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
               child: const Text("Close"),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  // -------------------------------------------------------------
-  // UI
-  // -------------------------------------------------------------
+  void showFilterSheet(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
+        child: StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Drag handle
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[400],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Title
+                const Text(
+                  "Filter Observations",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+
+                // Month
+                DropdownButtonFormField<String>(
+                  initialValue: selectedMonth,
+                  decoration: const InputDecoration(
+                    labelText: "Month",
+                    border: OutlineInputBorder(),
+                  ),
+                  items:
+                      [
+                            "All", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                          ]
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
+                          .toList(),
+                  onChanged: (v) {
+                    setSheetState(() => selectedMonth = v!);
+                    setState(() => selectedMonth = v!);
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Radius
+                DropdownButtonFormField<String>(
+                  initialValue: selectedRadius,
+                  decoration: const InputDecoration(
+                    labelText: "Search Radius",
+                    suffixText: " km",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ["5", "10", "20", "50"]
+                      .map(
+                        (e) => DropdownMenuItem(value: e, child: Text("$e km")),
+                      )
+                      .toList(),
+                  onChanged: (v) {
+                    setSheetState(() => selectedRadius = v!);
+                    setState(() => selectedRadius = v!);
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Limit
+                DropdownButtonFormField<String>(
+                  initialValue: selectedLimit,
+                  decoration: const InputDecoration(
+                    labelText: "Max Results",
+                    suffixText: " Species",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ["5", "10", "15", "20", "50"]
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (v) {
+                    setSheetState(() => selectedLimit = v!);
+                    setState(() => selectedLimit = v!);
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Species
+                DropdownButtonFormField<String>(
+                  initialValue: selectedSpecies,
+                  decoration: const InputDecoration(
+                    labelText: "Show",
+                    border: OutlineInputBorder(),
+                  ),
+                  items: speciesList
+                      .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                      .toList(),
+                  onChanged: (v) {
+                    setSheetState(() => selectedSpecies = v!);
+                    setState(() => selectedSpecies = v!);
+                  },
+                ),
+
+                const SizedBox(height: 32),
+
+                // Full-width Apply Button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.tertiary.withValues(alpha: 0.9),
+                    elevation: 5,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                    await _saveFilterPreferences();
+
+                    final BuildContext currentContext = context;
+                    if (!currentContext.mounted) return;
+                    Navigator.pop(context);
+
+                    setState(() => mushroomMarkers.clear());
+                    await fetchMushrooms();
+                  },
+                  child: const Text(
+                    "Apply Filters",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (userLocation == null) {
@@ -205,135 +376,42 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     }
 
     return Scaffold(
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        title: const Text("Forage Map"),
+        backgroundColor: colorScheme.tertiary,
+        title: Text("Forage Map", style: TextStyle(color: colorScheme.onSurface)),
         centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_alt),
             onPressed: () => showFilterSheet(context),
-          )
+          ),
         ],
       ),
       body: FlutterMap(
-        options: MapOptions(
-          initialCenter: userLocation!,
-          initialZoom: 12,
-        ),
+        options: MapOptions(initialCenter: userLocation!, initialZoom: 12),
         children: [
           TileLayer(
             urlTemplate:
-            "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+                "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
             userAgentPackageName: "vn.vinh.fungiScan",
           ),
-          MarkerLayer(markers: [
-            Marker(
-              width: 50,
-              height: 50,
-              point: userLocation!,
-              child: const Icon(Icons.person_pin_circle,
-                  size: 45, color: Colors.blue),
-            ),
-            ...mushroomMarkers
-          ])
+          MarkerLayer(
+            markers: [
+              Marker(
+                width: 50,
+                height: 50,
+                point: userLocation!,
+                child: const Icon(
+                  Icons.person_pin_circle,
+                  size: 45,
+                  color: Colors.blue,
+                ),
+              ),
+              ...mushroomMarkers,
+            ],
+          ),
         ],
-      ),
-    );
-  }
-
-  // -------------------------------------------------------------
-  // FILTER SHEET
-  // -------------------------------------------------------------
-  void showFilterSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 50,
-              right: 50,
-              top: 20,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20, // Safe for keyboard
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text("Filter options", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                const SizedBox(height: 16),
-
-                // month
-                DropdownButton<String>(
-                  value: selectedMonth,
-                  items: [
-                    "All",
-                    "Jan", "Feb", "Mar", "Apr",
-                    "May", "Jun", "Jul", "Aug",
-                    "Sep", "Oct", "Nov", "Dec"
-                  ].map((e) {
-                    return DropdownMenuItem(value: e, child: Text(e));
-                  }).toList(),
-                  onChanged: (v) {
-                    setSheetState(() => selectedMonth = v!);
-                    setState(() => selectedMonth = v!);
-                  },
-                ),
-
-                // radius
-                DropdownButton<String>(
-                  value: selectedRadius,
-                  items: ["5", "10", "20", "50"].map((e) {
-                    return DropdownMenuItem(
-                        value: e, child: Text("$e km radius"));
-                  }).toList(),
-                  onChanged: (v) {
-                    setSheetState(() => selectedRadius = v!);
-                    setState(() => selectedRadius = v!);
-                  },
-                ),
-
-                // limit
-                DropdownButton<String>(
-                  value: selectedLimit,
-                  items: ["5", "10", "15", "20"].map((e) {
-                    return DropdownMenuItem(
-                        value: e, child: Text("$e mushrooms"));
-                  }).toList(),
-                  onChanged: (v) {
-                    setSheetState(() => selectedLimit = v!);
-                    setState(() => selectedLimit = v!);
-                  },
-                ),
-
-                // species
-                DropdownButton<String>(
-                  value: selectedSpecies,
-                  items: speciesList.map((e) {
-                    return DropdownMenuItem(value: e, child: Text(e));
-                  }).toList(),
-                  onChanged: (v) {
-                    setSheetState(() => selectedSpecies = v!);
-                    setState(() => selectedSpecies = v!);
-                  },
-                ),
-
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.9),
-                    elevation: 5
-                  ),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    await fetchMushrooms();
-                  },
-                  child: const Text("Apply"),
-                )
-              ],
-            ),
-          );
-        },
       ),
     );
   }
