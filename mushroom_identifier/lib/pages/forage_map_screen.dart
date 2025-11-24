@@ -57,6 +57,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     await prefs.setString('forage_species', selectedSpecies);
   }
 
+  // -------------------------------------------------------------
+  // LOCATION
+  // -------------------------------------------------------------
   Future<void> initLocation() async {
     final permission = await _handlePermission();
     if (!permission) {
@@ -81,6 +84,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         permission == LocationPermission.always;
   }
 
+  // -------------------------------------------------------------
+  // iNATURALIST API CALL
+  // -------------------------------------------------------------
   Future<void> fetchMushrooms() async {
     if (userLocation == null) return;
 
@@ -157,7 +163,10 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     return months[m] ?? 1;
   }
 
-    void showSpeciesDetail(dynamic item) {
+  // -------------------------------------------------------------
+  // SHOW MARKER DETAILS
+  // -------------------------------------------------------------
+  void showSpeciesDetail(dynamic item) {
     final species = item["taxon"]?["name"] ?? "Unknown";
     final common = item["taxon"]?["preferred_common_name"] ?? "Unknown";
     final imageUrl = item["photos"] != null && item["photos"].isNotEmpty
@@ -202,6 +211,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
+  // -------------------------------------------------------------
+  // FILTER SHEET
+  // -------------------------------------------------------------
   void showFilterSheet(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -255,9 +267,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                     border: OutlineInputBorder(),
                   ),
                   items:
-                      [
-                            "All", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+                    [
+                      "All", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
                           ]
                           .map(
                             (e) => DropdownMenuItem(value: e, child: Text(e)),
@@ -362,6 +374,9 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
+  // -------------------------------------------------------------
+  // UI
+  // -------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;

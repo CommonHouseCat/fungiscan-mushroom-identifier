@@ -29,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
       if (!mounted) return;
       setState(() {
         _allMushrooms = data;
-        _filteredResults = data.entries.take(10).toList();
+        _filteredResults = data.entries.take(8).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -46,7 +46,7 @@ class _SearchScreenState extends State<SearchScreen> {
       _query = query.trim().toLowerCase();
 
       if (_query.isEmpty) {
-        _filteredResults = _allMushrooms.entries.take(10).toList();
+        _filteredResults = _allMushrooms.entries.take(8).toList();
         return;
       }
 
@@ -56,7 +56,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
         final common = meta["common_name"]?.toString().toLowerCase() ?? "";
         final scientific = meta["scientific_name"]?.toString().toLowerCase() ?? "";
-
         final keywords = (meta["keywords"] as List<dynamic>?)
             ?.map((e) => e.toString().toLowerCase())
             .toList() ??
@@ -92,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
               decoration: InputDecoration(
                 hintText: "Search mushrooms...",
                 filled: true,
-                fillColor: colorScheme.surface,
+                fillColor: colorScheme.tertiary, 
                 prefixIcon: Icon(Icons.search, color: colorScheme.onSurface),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
