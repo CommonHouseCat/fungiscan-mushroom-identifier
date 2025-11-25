@@ -91,7 +91,7 @@ class _SearchScreenState extends State<SearchScreen> {
               decoration: InputDecoration(
                 hintText: "Search mushrooms...",
                 filled: true,
-                fillColor: colorScheme.tertiary, 
+                fillColor: colorScheme.tertiary,
                 prefixIcon: Icon(Icons.search, color: colorScheme.onSurface),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),

@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ForageMapScreen extends StatefulWidget {
   const ForageMapScreen({super.key});
@@ -14,16 +17,27 @@ class ForageMapScreen extends StatefulWidget {
 }
 
 class _ForageMapScreenState extends State<ForageMapScreen> {
+  final PopupController _popupController = PopupController();
+  final MapController _mapController = MapController();
   LatLng? userLocation;
   bool loading = true;
+  Timer? _debounceTimer;
 
   final List<String> speciesList = ["All Species", "Only Mushrooms"];
   List<Marker> mushroomMarkers = [];
-
   late String selectedMonth;
   String selectedRadius = "5";
   String selectedLimit = "20";
   String selectedSpecies = "Only Mushrooms";
+
+  void _animateToUserLocation() {
+    if (userLocation == null) return;
+    _mapController.moveAndRotate(
+      userLocation!,
+      13.5,
+      0,
+    );
+  }
 
   @override
   void initState() {
@@ -173,6 +187,8 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         ? item["photos"][0]["url"].toString().replaceAll("square", "medium")
         : null;
 
+    final inatUrl = item["uri"] as String?;
+
     showModalBottomSheet(
       context: context,
       builder: (_) => Padding(
@@ -192,16 +208,53 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
             if (imageUrl != null)
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.network(imageUrl, height: 150),
+                borderRadius: BorderRadius.circular(12),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.network(
+                      imageUrl,
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
+                ),
               ),
 
-            const SizedBox(height: 10),
+            if (imageUrl == null)
+              Container(
+                height: 150,
+                color: Colors.grey[200],
+                child: const Center(child: Icon(Icons.image_not_supported, size: 50)),
+              ),
+
+            const SizedBox(height: 20),
 
             Text("Observed on: ${item["observed_on"] ?? 'Unknown'}"),
             const SizedBox(height: 8),
 
+            if (inatUrl != null)
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context,).colorScheme.tertiary.withValues(alpha: 0.9),
+                  elevation: 5,
+                ),
+                onPressed: () async {
+                  final uri = Uri.parse(inatUrl);
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
+                },
+                icon: const Icon(Icons.open_in_browser),
+                label: const Text("Open Full Observation"),
+              ),
+
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context,).colorScheme.tertiary.withValues(alpha: 0.9),
+                elevation: 5,
+              ),
               onPressed: () => Navigator.pop(context),
               child: const Text("Close"),
             ),
@@ -310,7 +363,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                     suffixText: " Species",
                     border: OutlineInputBorder(),
                   ),
-                  items: ["5", "10", "15", "20", "50"]
+                  items: ["5", "10", "15", "20", "50", "100", "200"]
                       .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                       .toList(),
                   onChanged: (v) {
@@ -341,24 +394,34 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                 // Full-width Apply Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.tertiary.withValues(alpha: 0.9),
+                    backgroundColor: Theme.of(context,).colorScheme.tertiary.withValues(alpha: 0.9),
                     elevation: 5,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () async {
-                    await _saveFilterPreferences();
+                    // Cancel any pending request
+                    _debounceTimer?.cancel();
 
-                    final BuildContext currentContext = context;
-                    if (!currentContext.mounted) return;
-                    Navigator.pop(context);
+                    // Start a new 600ms debounce
+                    _debounceTimer = Timer(const Duration(milliseconds: 600), () async {
+                      await _saveFilterPreferences();
 
-                    setState(() => mushroomMarkers.clear());
-                    await fetchMushrooms();
+                      // Safely pop only if still mounted
+                      if (!context.mounted) return;
+                      Navigator.pop(context);
+
+                      setState(() {
+                        mushroomMarkers.clear();
+                        loading = true; // Optional: show spinner during refresh
+                      });
+
+                      await fetchMushrooms();
+
+                      if (mounted) {
+                      setState(() => loading = false);
+                      }
+                    });
                   },
                   child: const Text(
                     "Apply Filters",
@@ -372,6 +435,12 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   // -------------------------------------------------------------
@@ -403,30 +472,69 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
           ),
         ],
       ),
-      body: FlutterMap(
-        options: MapOptions(initialCenter: userLocation!, initialZoom: 12),
-        children: [
-          TileLayer(
-            urlTemplate:
-                "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
-            userAgentPackageName: "vn.vinh.fungiScan",
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 62.0),
+        child: FloatingActionButton(
+          onPressed: _animateToUserLocation,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
+          child: const Icon(Icons.my_location),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+
+      body: PopupScope(
+        popupController: _popupController,
+        child: FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: userLocation!,
+            initialZoom: 12,
+            onTap: (_, _) => _popupController.hideAllPopups(),
           ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                width: 50,
-                height: 50,
-                point: userLocation!,
-                child: const Icon(
-                  Icons.person_pin_circle,
-                  size: 45,
-                  color: Colors.blue,
+          children: [
+            TileLayer(
+              urlTemplate:
+                  "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+              userAgentPackageName: "vn.vinh.fungiScan",
+            ),
+        
+            MarkerLayer(
+              markers: [
+                Marker(
+                  width: 50,
+                  height: 50,
+                  point: userLocation!,
+                  child: const Icon(
+                    Icons.person_pin_circle,
+                    size: 45,
+                    color: Colors.blue,
+                  ),
                 ),
+              ],
+            ),
+        
+            MarkerClusterLayerWidget(
+              options: MarkerClusterLayerOptions(
+                maxClusterRadius: 120,
+                size: const Size(40, 40),
+                markers: mushroomMarkers,
+                builder: (context, markers) {
+                  return FloatingActionButton(
+                    heroTag: null,
+                    backgroundColor: Colors.red,
+                    onPressed: null,
+                    child: Text(
+                      markers.length.toString(),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },
               ),
-              ...mushroomMarkers,
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
