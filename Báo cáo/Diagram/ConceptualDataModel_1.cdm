@@ -442,7 +442,7 @@ NameToCode=Yes
 CheckModel=Yes
 SaveLinks=Yes
 NameToCode=No</a:ModelOptionsText>
-<a:RepositoryFilename>C:\Users\ASUS\Desktop\Luan-van-tot-nghiep-CT502H\Báo cáo\Diagram\Database_Diagram.cdm</a:RepositoryFilename>
+<a:RepositoryFilename>C:\Users\ASUS\Desktop\Luan-van-tot-nghiep-CT502H\Báo cáo\Diagram\ConceptualDataModel_1.cdm</a:RepositoryFilename>
 <c:ConceptualDiagrams>
 <o:ConceptualDiagram Id="o3">
 <a:ObjectID>78E4A362-DF30-48AB-9051-DEDC5BEE611F</a:ObjectID>
