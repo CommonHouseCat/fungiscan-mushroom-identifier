@@ -51,9 +51,15 @@ class SearchResultItem extends StatelessWidget {
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => Image.asset(
+                  'assets/error.jpg',
+                  width: double.infinity,
+                  height: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               )
                   : Image.asset(
-                'assets/sample/error.jpg',
+                'assets/error.jpg',
                 width: double.infinity,
                 height: double.infinity,
                 fit: BoxFit.cover,

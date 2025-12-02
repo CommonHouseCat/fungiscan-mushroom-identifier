@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+
 class ForageMapScreen extends StatefulWidget {
   const ForageMapScreen({super.key});
 
@@ -76,15 +77,18 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   // -------------------------------------------------------------
   Future<void> initLocation() async {
     final permission = await _handlePermission();
+    if (!mounted) return;
     if (!permission) {
       setState(() => loading = false);
       return;
     }
 
     final pos = await Geolocator.getCurrentPosition();
+    if (!mounted) return;
     userLocation = LatLng(pos.latitude, pos.longitude);
 
     await fetchMushrooms();
+    if (!mounted) return;
 
     setState(() => loading = false);
   }
@@ -104,13 +108,11 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   Future<void> fetchMushrooms() async {
     if (userLocation == null) return;
 
-    // Build taxon filter
     String taxonFilter = "";
     if (selectedSpecies == "Only Mushrooms") {
       taxonFilter = "taxon_id=47170&"; // Fungi
     }
 
-    // Month filter
     String monthFilter = selectedMonth == "All"
         ? ""
         : "month=${_monthNumber(selectedMonth)}&";
@@ -124,50 +126,81 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         "radius=$selectedRadius&"
         "per_page=$selectedLimit";
 
-    final res = await http.get(Uri.parse(url));
+    try {
+      final res = await http.get(Uri.parse(url));
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (res.statusCode != 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to load observations")),
-      );
-      return;
-    }
+      if (res.statusCode != 200) {
+        _showApiError("Cannot connect to API. Please try again later.");
+        return;
+      }
 
-    final json = jsonDecode(res.body);
+      final json = jsonDecode(res.body);
+      final List results = json["results"];
+      mushroomMarkers.clear();
 
-    final List results = json["results"];
+      for (var r in results) {
+        if (r["geojson"] == null) continue;
+        final coords = r["geojson"]["coordinates"];
+        if (coords.length < 2) continue;
+        final lng = coords[0];
+        final lat = coords[1];
 
-    mushroomMarkers.clear();
-
-    for (int i = 0; i < results.length; i++) {
-      final r = results[i];
-      if (r["geojson"] == null) continue;
-
-      final coords = r["geojson"]["coordinates"];
-      if (coords.length < 2) continue;
-
-      final lng = coords[0];
-      final lat = coords[1];
-
-      mushroomMarkers.add(
-        Marker(
-          width: 40,
-          height: 40,
-          point: LatLng(lat, lng),
-          child: GestureDetector(
-            onTap: () => showSpeciesDetail(r),
-            child: const Icon(Icons.location_on, color: Colors.red, size: 32),
+        mushroomMarkers.add(
+          Marker(
+            width: 40,
+            height: 40,
+            point: LatLng(lat, lng),
+            child: GestureDetector(
+              onTap: () => showSpeciesDetail(r),
+              child: const Icon(Icons.location_on, color: Colors.red, size: 32),
+            ),
           ),
-        ),
-      );
-    }
+        );
+      }
 
-    if (mounted) {
-      setState(() {});
+      if (mounted) setState(() {});
+
+    } catch (e) {
+      if (!mounted) return;
+
+      final msg = e is http.ClientException
+          ? "No internet. Please try again later."
+          : "Cannot connect to API. Please try again later.";
+
+      _showApiError(msg);
     }
   }
+
+  void _showApiError(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Error"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                loading = true;
+              });
+              fetchMushrooms().then((_) {
+                if (mounted) setState(() => loading = false);
+              });
+            },
+            child: const Text("Retry"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Close"),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   int _monthNumber(String m) {
     const months = {

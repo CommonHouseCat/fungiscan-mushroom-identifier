@@ -25,7 +25,7 @@ class SearchResultInfoScreen extends StatelessWidget {
     }
   }
 
-  // Reusable info box — same as in MushroomInformationScreen
+  // Reusable info box
   Widget _buildInfoBox({
     required BuildContext context,
     required List<Widget> children,
@@ -79,7 +79,6 @@ class SearchResultInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final meta = mushroomData["search_metadata"] ?? {};
     final basic = mushroomData["basic_info"] ?? {};
 
     final colorScheme = Theme.of(context).colorScheme;
@@ -107,27 +106,24 @@ class SearchResultInfoScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Main Image
+            // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: meta["image"] != null
-                  ? Image.network(
-                meta["image"] as String,
+              child: Container(
                 width: double.infinity,
                 height: 260,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Image.asset(
-                  "assets/sample/error.jpg",
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 260,
+                color: Colors.grey[200],
+                child: const Center(
+                  child: Text(
+                    "Please connect to the internet to view the reference image",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black
+                    ),
+                  ),
                 ),
-              )
-                  : Image.asset(
-                "assets/sample/error.jpg",
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 260,
               ),
             ),
 

@@ -110,8 +110,40 @@ class _InferenceScreenState extends State<InferenceScreen> {
       );
     } catch (e) {
       if (!mounted) return;
+
+      String friendlyMessage;
+
+      if (e is DioException) {
+        switch (e.type) {
+          case DioExceptionType.connectionTimeout:
+          case DioExceptionType.receiveTimeout:
+          case DioExceptionType.sendTimeout:
+            friendlyMessage = "Server is taking too long to respond.\nPlease try again later.";
+            break;
+          case DioExceptionType.connectionError:
+            friendlyMessage = "No internet connection.\nPlease check your network and try again.";
+            break;
+          case DioExceptionType.badResponse:
+            final statusCode = e.response?.statusCode;
+            if (statusCode == 404) {
+              friendlyMessage = "Inference server not found.\nPlease contact admin and try again later.";
+            }  else if (statusCode == 500) {
+              friendlyMessage = "Server error occurred.\nPlease try again later.";
+            } else {
+              friendlyMessage = "Server returned an error ($statusCode).\nPlease try again.";
+            }
+            break;
+          default:
+            friendlyMessage = "Failed to connect to server.\nPlease check your internet connection.";
+        }
+      } else {
+        friendlyMessage = e.toString().contains('not found')
+            ? "Mushroom not recognized.\nTry taking a clearer photo."
+            : "An unexpected error occurred.\nPlease try again.";
+      }
+
       setState(() {
-        _error = e.toString();
+        _error = friendlyMessage;
         _isLoading = false;
       });
     }
