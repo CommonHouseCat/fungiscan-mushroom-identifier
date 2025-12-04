@@ -1,16 +1,15 @@
-# mushroom_identifier
+## Installing the App on a Physical Device (via USB with ADB)
 
-A new Flutter project.
+1. On your Android device, enable **Developer Options**.
+2. Enable **USB Debugging** in Developer Options.
+3. Connect your phone to your computer via USB and allow USB debugging when prompted.
 
-## Getting Started
+Then run one of the following commands in your terminal:
+```sh
+adb install build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If installing over an older version of the app (recommended flag):
+```sh
+adb install -r build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+```

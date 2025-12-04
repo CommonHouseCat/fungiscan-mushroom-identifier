@@ -6,6 +6,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -94,13 +95,40 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   }
 
   Future<bool> _handlePermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+    var status = await Permission.location.status;
+    if (status.isDenied) {
+      status = await Permission.location.request();
     }
-    return permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always;
+    if (status.isPermanentlyDenied) {
+      _showPermissionDialog();
+      return false;
+    }
+    return status.isGranted;
   }
+
+  void _showPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Permission Denied"),
+        content: const Text("Please enable location permission in system settings."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: const Text("Open Settings"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   // -------------------------------------------------------------
   // iNATURALIST API CALL
@@ -424,7 +452,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
                 const SizedBox(height: 32),
 
-                // Full-width Apply Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context,).colorScheme.tertiary.withValues(alpha: 0.9),
@@ -433,20 +460,17 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   onPressed: () async {
-                    // Cancel any pending request
                     _debounceTimer?.cancel();
 
-                    // Start a new 600ms debounce
                     _debounceTimer = Timer(const Duration(milliseconds: 600), () async {
                       await _saveFilterPreferences();
 
-                      // Safely pop only if still mounted
                       if (!context.mounted) return;
                       Navigator.pop(context);
 
                       setState(() {
                         mushroomMarkers.clear();
-                        loading = true; // Optional: show spinner during refresh
+                        loading = true;
                       });
 
                       await fetchMushrooms();
@@ -487,8 +511,26 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     }
 
     if (userLocation == null) {
-      return const Scaffold(
-        body: Center(child: Text("Cannot find user location!")),
+      return Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
+          backgroundColor: colorScheme.tertiary,
+          title: Text("Forage Map", style: TextStyle(color: colorScheme.onSurface)),
+          centerTitle: true,
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text("Cannot get location"),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () => initLocation(),
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
