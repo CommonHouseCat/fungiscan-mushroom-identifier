@@ -61,7 +61,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return BottomBar(
-      borderRadius: BorderRadius.circular(25),
+      borderRadius: BorderRadius.circular(12),
       duration: const Duration(milliseconds: 400),
       barColor: colorScheme.tertiary.withValues(alpha: 0.9),
       body: (context, controller) => PageView(
@@ -74,17 +74,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ForageMapScreen(),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _buildNavItem(Icons.home, 0, colorScheme),
-            _buildNavItem(Icons.history, 1, colorScheme),
-            _buildNavItem(Icons.search, 2, colorScheme),
-            _buildNavItem(Icons.map, 3, colorScheme),
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildNavItem(Icons.home, 0, colorScheme),
+          _buildNavItem(Icons.history, 1, colorScheme),
+          _buildNavItem(Icons.search, 2, colorScheme),
+          _buildNavItem(Icons.map, 3, colorScheme),
+        ],
       ),
     );
   }
