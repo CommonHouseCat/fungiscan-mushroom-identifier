@@ -25,6 +25,10 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
   bool loading = true;
   Timer? _debounceTimer;
 
+  LatLng? _lastFetchLocation;
+  StreamSubscription<Position>? _positionSub;
+  static const double _refetchDistanceMeters = 200; // Mushroom data refresh distance
+
   final List<String> speciesList = ["All Species", "Only Mushrooms"];
   List<Marker> mushroomMarkers = [];
   late String selectedMonth;
@@ -34,11 +38,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
   void _animateToUserLocation() {
     if (userLocation == null) return;
-    _mapController.moveAndRotate(
-      userLocation!,
-      13.5,
-      0,
-    );
+    _mapController.moveAndRotate(userLocation!, 13.5, 0);
   }
 
   @override
@@ -86,9 +86,15 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
     final pos = await Geolocator.getCurrentPosition();
     if (!mounted) return;
+
     userLocation = LatLng(pos.latitude, pos.longitude);
 
+    _lastFetchLocation = userLocation;
+
     await fetchMushrooms();
+
+    _startLocationTracking();
+
     if (!mounted) return;
 
     setState(() => loading = false);
@@ -127,6 +133,43 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         ],
       ),
     );
+  }
+
+  void _startLocationTracking() {
+    _positionSub?.cancel();
+
+    const settings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // update
+    );
+
+    _positionSub = Geolocator
+        .getPositionStream(locationSettings: settings)
+        .listen((pos) async {
+      final newLocation = LatLng(pos.latitude, pos.longitude);
+
+      userLocation = newLocation;
+
+      if (_lastFetchLocation == null) return;
+
+      final distance = const Distance().as(
+        LengthUnit.Meter,
+        _lastFetchLocation!,
+        newLocation,
+      );
+
+      // refetch only after significant movement
+      if (distance >= _refetchDistanceMeters) {
+        _lastFetchLocation = newLocation;
+
+        if (!mounted) return;
+        setState(() => loading = true);
+
+        await fetchMushrooms();
+
+        if (mounted) setState(() => loading = false);
+      }
+    });
   }
 
 
