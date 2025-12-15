@@ -158,16 +158,20 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         newLocation,
       );
 
-      // refetch only after significant movement
-      if (distance >= _refetchDistanceMeters) {
+      if (distance >= _refetchDistanceMeters) { // reload map after 200 meters
         _lastFetchLocation = newLocation;
 
         if (!mounted) return;
-        setState(() => loading = true);
+        setState(() {
+          mushroomMarkers.clear();
+          loading = true;
+        });
 
         await fetchMushrooms();
 
-        if (mounted) setState(() => loading = false);
+        setState(() {
+          loading = false;
+        });
       }
     });
   }
