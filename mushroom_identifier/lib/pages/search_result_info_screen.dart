@@ -80,6 +80,8 @@ class SearchResultInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final basic = mushroomData["basic_info"] ?? {};
+    final meta = mushroomData["search_metadata"];
+    final String? imageUrl = meta?["image"];
 
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -109,20 +111,25 @@ class SearchResultInfoScreen extends StatelessWidget {
             // Image
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 height: 260,
-                color: Colors.grey[200],
-                child: const Center(
-                  child: Text(
-                    "Please connect to the internet to view the reference image",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black
-                    ),
+                child: imageUrl != null
+                    ? Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (_, _, _) => Image.asset(
+                    'assets/error.jpg',
+                    fit: BoxFit.cover,
                   ),
+                )
+                    : Image.asset(
+                  'assets/error.jpg',
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
