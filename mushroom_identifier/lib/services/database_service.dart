@@ -79,6 +79,16 @@ class DatabaseService {
     );
   }
 
+  Future<void> toggleBookmark(int id, bool currentState) async {
+    final db = await database;
+    await db.update(
+      tableMushrooms,
+      {columnIsBookMark: currentState ? 0 : 1},
+      where: '$columnId = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<void> insertMushroomInfo({
     required Uint8List imageBytes,
     required double confidenceScore,
@@ -102,15 +112,5 @@ class DatabaseService {
       columnWikipedia: wikipediaUrl,
       columnIsBookMark: 0,
     });
-  }
-
-  Future<void> toggleBookmark(int id, bool currentState) async {
-    final db = await database;
-    await db.update(
-      tableMushrooms,
-      {columnIsBookMark: currentState ? 0 : 1},
-      where: '$columnId = ?',
-      whereArgs: [id],
-    );
   }
 }

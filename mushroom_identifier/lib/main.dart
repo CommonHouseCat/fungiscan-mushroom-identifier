@@ -14,8 +14,8 @@ Future<void> main() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.init(dir.path);
   await Hive.openBox('cache');
-
   await dotenv.load(fileName: ".env");
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => ThemeProvider(isDarkMode)),
@@ -26,7 +26,6 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

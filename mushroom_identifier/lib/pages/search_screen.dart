@@ -122,11 +122,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 childAspectRatio: 1.05,
               ),
               itemCount: _filteredResults.length,
+
               itemBuilder: (context, index) {
                 final entry = _filteredResults[index];
                 final id = entry.key;
                 final data = entry.value;
-
                 return SearchResultItem(
                     id: id,
                     data: data

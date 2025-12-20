@@ -30,13 +30,9 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
           toolbarColor: Colors.black,
           toolbarWidgetColor: Colors.white,
           hideBottomControls: false,
-          lockAspectRatio: true,
+          lockAspectRatio: false,
           initAspectRatio: CropAspectRatioPreset.ratio16x9,
-        ),
-        IOSUiSettings(
-          title: "Edit Image",
-          aspectRatioLockEnabled: true,
-        ),
+        )
       ],
     );
 
@@ -45,8 +41,8 @@ class _ImageEditorScreenState extends State<ImageEditorScreen> {
     final tempDir = await getTemporaryDirectory();
     final outputPath =
         "${tempDir.path}/edited_${DateTime.now().millisecondsSinceEpoch}.jpg";
-
     final file = File(outputPath);
+
     final bytes = await cropped.readAsBytes();
     await file.writeAsBytes(bytes);
 

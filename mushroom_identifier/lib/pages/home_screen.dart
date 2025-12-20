@@ -84,7 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final colorScheme = Theme.of(context).colorScheme;
 
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(

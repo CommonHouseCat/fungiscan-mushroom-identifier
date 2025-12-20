@@ -25,7 +25,6 @@ class SearchResultInfoScreen extends StatelessWidget {
     }
   }
 
-  // Reusable info box
   Widget _buildInfoBox({
     required BuildContext context,
     required List<Widget> children,
@@ -44,7 +43,6 @@ class SearchResultInfoScreen extends StatelessWidget {
     );
   }
 
-  // Consistent bullet point style — larger font, bold titles
   Widget _buildBulletPoint(String title, String content, BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textColor = colorScheme.onSurface;
@@ -197,7 +195,6 @@ class SearchResultInfoScreen extends StatelessWidget {
                 _buildBulletPoint("", mushroomData["safety_tips"]?.toString() ?? "N/A", context),
               ],
             ),
-
             const SizedBox(height: 30),
           ],
         ),

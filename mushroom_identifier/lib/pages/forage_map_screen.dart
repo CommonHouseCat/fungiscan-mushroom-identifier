@@ -10,7 +10,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class ForageMapScreen extends StatefulWidget {
   const ForageMapScreen({super.key});
 
@@ -50,7 +49,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     ];
     selectedMonth = monthAbbreviations[DateTime.now().month - 1];
     _loadFilterPreferences().then((_) {
-      initLocation();
+      _initLocation();
     });
   }
 
@@ -65,18 +64,14 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     }
   }
 
-  // Save preferences whenever user applies filters
   Future<void> _saveFilterPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('forage_radius', selectedRadius);
     await prefs.setString('forage_limit', selectedLimit);
     await prefs.setString('forage_species', selectedSpecies);
   }
-
-  // -------------------------------------------------------------
-  // LOCATION
-  // -------------------------------------------------------------
-  Future<void> initLocation() async {
+  
+  Future<void> _initLocation() async {
     final permission = await _handlePermission();
     if (!mounted) return;
     if (!permission) {
@@ -86,18 +81,15 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
     final pos = await Geolocator.getCurrentPosition();
     if (!mounted) return;
-
     userLocation = LatLng(pos.latitude, pos.longitude);
 
     _lastFetchLocation = userLocation;
-
-    await fetchMushrooms();
-
+    await _fetchObservations();
     _startLocationTracking();
 
     if (!mounted) return;
-
-    setState(() => loading = false);
+    setState(() => loading = false)
+    ;
   }
 
   Future<bool> _handlePermission() async {
@@ -140,7 +132,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
 
     const settings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 10, // update
+      distanceFilter: 10, // move marker every 10 meters
     );
 
     _positionSub = Geolocator
@@ -167,7 +159,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
           loading = true;
         });
 
-        await fetchMushrooms();
+        await _fetchObservations();
 
         setState(() {
           loading = false;
@@ -176,11 +168,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     });
   }
 
-
-  // -------------------------------------------------------------
-  // iNATURALIST API CALL
-  // -------------------------------------------------------------
-  Future<void> fetchMushrooms() async {
+  Future<void> _fetchObservations() async {
     if (userLocation == null) return;
 
     String taxonFilter = "";
@@ -228,7 +216,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
             height: 40,
             point: LatLng(lat, lng),
             child: GestureDetector(
-              onTap: () => showSpeciesDetail(r),
+              onTap: () => _showSpeciesDetail(r),
               child: const Icon(Icons.location_on, color: Colors.red, size: 32),
             ),
           ),
@@ -261,7 +249,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
               setState(() {
                 loading = true;
               });
-              fetchMushrooms().then((_) {
+              _fetchObservations().then((_) {
                 if (mounted) setState(() => loading = false);
               });
             },
@@ -276,7 +264,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
-
   int _monthNumber(String m) {
     const months = {
       "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7,
@@ -284,11 +271,8 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     };
     return months[m] ?? 1;
   }
-
-  // -------------------------------------------------------------
-  // SHOW MARKER DETAILS
-  // -------------------------------------------------------------
-  void showSpeciesDetail(dynamic item) {
+  
+  void _showSpeciesDetail(dynamic item) {
     final species = item["taxon"]?["name"] ?? "Unknown";
     final common = item["taxon"]?["preferred_common_name"] ?? "Unknown";
     final imageUrl = item["photos"] != null && item["photos"].isNotEmpty
@@ -372,10 +356,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     );
   }
 
-  // -------------------------------------------------------------
-  // FILTER SHEET
-  // -------------------------------------------------------------
-  void showFilterSheet(BuildContext context) {
+  void _showFilterSheet(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     showModalBottomSheet(
@@ -520,7 +501,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
                         loading = true;
                       });
 
-                      await fetchMushrooms();
+                      await _fetchObservations();
 
                       if (mounted) {
                       setState(() => loading = false);
@@ -547,9 +528,6 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
     super.dispose();
   }
 
-  // -------------------------------------------------------------
-  // UI
-  // -------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -572,7 +550,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
               const Text("Cannot get location"),
               const SizedBox(height: 12),
               ElevatedButton(
-                onPressed: () => initLocation(),
+                onPressed: () => _initLocation(),
                 child: const Text("Retry"),
               ),
             ],
@@ -590,7 +568,7 @@ class _ForageMapScreenState extends State<ForageMapScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_alt),
-            onPressed: () => showFilterSheet(context),
+            onPressed: () => _showFilterSheet(context),
           ),
         ],
       ),
