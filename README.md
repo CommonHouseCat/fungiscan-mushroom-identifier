@@ -9,10 +9,12 @@ The app also features an interactive map (OSM) integrated with the iNaturalist A
 
 ## Preview
 
-| ![home](Previews/1.png) | ![home(dark)](Previews/2.png) | ![history](Previews/3.png) | ![search](Previews/4.png) | ![forage map](Previews/4.png) | 
-|---------------------------------|:-------------------------------------:|:--------------------------------:|:--------------------------------------:|:--------------------------------------:|
+| Home | Home (Dark Mode) | History | Search | Forage Map |
+| ------------------------------------ | ----------------------------------- | -------------------------- | ------------------------- | ----------------------------- |
+| ![Home (Light Mode)](Previews/1.jpg) | ![Home (Dark Mode)](Previews/2.jpg) | ![History](Previews/3.jpg) | ![Search](Previews/4.jpg) | ![Forage Map](Previews/5.jpg) |
 
 ## Tech stack & Libraries
+
 - [Flutter](https://flutter.dev/) - Cross-platform framework for building the Android mobile application.
 - [Dart](https://dart.dev/) - Programming language used with Flutter for client-side development.
 - [SQLite](https://sqlite.org/index.html) - Local database for storing identification history and enabling offline access.
