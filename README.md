@@ -1,6 +1,9 @@
 # FungiScan - Mushroom Indentifier Application
+
 <p align="center">
+  <img src="https://skillicons.dev/icons?i=flutter,dart" alt="Flutter & Dart">
   <a href="https://android-arsenal.com/api?level=33"><img alt="API" src="https://img.shields.io/badge/API-33%2B-brightgreen"/></a>
+  <img src="https://img.shields.io/badge/Thesis-Graduation%20Project-blueviolet" alt="Graduation Thesis">
   <a href="https://github.com/CommonHouseCat"><img alt="Profile" src="https://commonhousecat.github.io/badges/profile-badge.svg"/></a>
 </p>
 
