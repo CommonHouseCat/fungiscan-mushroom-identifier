@@ -7,8 +7,8 @@
   <a href="https://github.com/CommonHouseCat"><img alt="Profile" src="https://commonhousecat.github.io/badges/profile-badge.svg"/></a>
 </p>
 
-A mobile mushroom identification app that uses a cloud-hosted Vision Transformer (ViT) model for real-time identification, with results and species data stored locally for offline use. 
-The app also features an interactive map (OSM) integrated with the iNaturalist API to allow users to explore nearby forageables. 
+A mobile mushroom identification app that uses a cloud-hosted Vision Transformer (ViT) model for real-time identification, with results and species data stored locally for offline use.
+The app also includes a keyword-based search feature and an interactive map (OSM) integrated with the iNaturalist API to allow users to explore nearby forageables.
 
 ## Preview
 
