@@ -30,7 +30,6 @@ The app also includes a keyword-based search feature and an interactive map (OSM
 - [CUDA](https://developer.nvidia.com/cuda/) - Parallel computing platform for GPU-accelerated model training.
 - [FastAPI](https://fastapi.tiangolo.com/) - Web framework for the server-side API endpoint.
 - [Lightning.ai Studios](https://lightning.ai/) - Cloud platform for hosting the model server.
-- 
 
 ## Features
 
